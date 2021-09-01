@@ -1,10 +1,15 @@
 .DS_Store
 .thumbs.db
 node_modules
+package-lock.json
 
 # Quasar core related directories
 .quasar
 /dist
+
+.vscode
+/config/dev.env.js
+/config/prod.env.js
 
 # Cordova related directories and files
 /src-cordova/node_modules

@@ -1,0 +1,168 @@
+<template>
+  <q-layout view="lHh lpR lff">
+
+    <q-header :class="{ 'bg-primary': ! $q.dark.isActive, 'q-dark': $q.dark.isActive }">
+      <q-toolbar>
+        <q-btn dense flat round icon="menu" :color="!$q.dark.isActive ? 'black' : ''" @click="toggleLeftDrawer" />
+        <q-space />
+        <q-space />
+        <q-toggle v-model="darkMode" icon="dark_mode" @click="darkModeChange" />
+      </q-toolbar>
+      <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered :breakpoint="700" class="aside-dark"
+        :width="250">
+        <div class="text-center">
+          <p class="text-white text-h6">
+            <q-icon name="dashboard" size="sm" /> Frontend base
+          </p>
+          <div class="text-center q-pa-md">
+            <q-avatar v-if="usuario?.nombres" size="64px" font-size="42px" color="info" text-color="white">
+              {{ usuario?.nombres[0]?.toUpperCase() }}
+            </q-avatar>
+            <div class="text-weight-bold text-white q-mt-sm">{{ usuario?.nombres }}</div>
+            <div>{{ usuario?.correoElectronico }}</div>
+          </div>
+        </div>
+        <q-list padding v-if="menu.length">
+          <q-item-label header class="text-white ">Menu</q-item-label>
+          <q-item v-for="item in menu" :key="item.ruta"
+            :active="($route.path.includes(item.ruta) && item.ruta !== '') || (item.ruta === '' && $route.path === '/')"
+            clickable v-ripple @click="$router.push(`/app/${item.ruta}`)">
+            <q-item-section avatar>
+              <q-icon :name="item.icono" />
+            </q-item-section>
+            <q-item-section>
+              {{ item.nombre }}
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-drawer>
+    </q-header>
+
+    <q-page-container>
+      <router-view class="layout-view" style="padding-top:15px;" />
+    </q-page-container>
+
+    <q-footer class="q-footer-main">
+      <q-toolbar>
+        <q-toolbar-title>
+          <div class="footer">
+            © Justicia {{ new Date().getFullYear() }}
+          </div>
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
+
+  </q-layout>
+</template>
+
+<script>
+import { defineComponent, ref, computed, onMounted, inject } from 'vue'
+import { useStore } from 'vuex'
+import { useQuasar } from 'quasar'
+
+export default defineComponent({
+  name: 'MainLayout',
+  setup (props, context) {
+    const _auth = inject('auth')
+
+    onMounted(() => {
+      _auth.initStore()
+    })
+
+    const $q = useQuasar()
+    const darkMode = ref($q.dark.isActive)
+    const leftDrawerOpen = ref(false)
+    const store = useStore()
+
+    return {
+      darkMode,
+      darkModeChange () {
+        $q.dark.set(!$q.dark.isActive)
+      },
+      menu: computed(() => store.state.global.menu),
+      usuario: computed(() => store.state.global.usuario),
+      leftDrawerOpen,
+      toggleLeftDrawer () {
+        leftDrawerOpen.value = !leftDrawerOpen.value
+      }
+    }
+  }
+})
+</script>
+
+<style lang="scss">
+$aside: #1e1e2d;
+$aside-dark: #1b1b28;
+$height: 190px;
+
+.q-drawer-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+.aside-dark {
+  background-color: $aside;
+  color: #9899ac;
+
+  .aside-scroll {
+    height: calc(100% - 190px);
+    margin-top: $height;
+  }
+
+  .aside-header {
+    height: $height;
+    background-color: $aside-dark;
+  }
+
+  .aside-title {
+    color: white;
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+    // text-align: center;
+    line-height: 3.2rem;
+    background: #1b1b28;
+    padding: 0 28px;
+  }
+
+  .aside-email {
+    font-size: 0.75rem;
+  }
+
+  .q-item {
+    padding: 6px 25px;
+    min-height: 46px;
+
+    &.q-router-link--active,
+    &:hover {
+      transition: color .2s ease,background-color .2s ease;
+      background-color: $aside-dark;
+
+      .q-item__section--main {
+        color: white;
+      }
+
+      .q-icon {
+        color: $primary;
+      }
+    }
+
+    .q-item__section--avatar {
+      padding-right: 10px;
+      min-width: 40px;
+    }
+
+    &.q-hoverable:hover {
+      & > .q-focus-helper {
+        opacity: 0;
+      }
+    }
+
+    .q-icon {
+      color: #494b74;
+    }
+  }
+}
+</style>

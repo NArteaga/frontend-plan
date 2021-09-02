@@ -13,24 +13,59 @@
           </q-toolbar>
           <q-card-section class="q-pt-none">
             <q-form @submit="login">
-              <q-input filled v-model="formulario.usuario" label="Usuario o correo electrónico" lazy-rules square
-                class="q-mb-md" autofocus :rules="rulesLogin.usuario">
+              <q-input
+                filled
+                v-model="formulario.usuario"
+                label="Usuario o correo electrónico"
+                lazy-rules
+                square
+                class="q-mb-md"
+                autofocus
+                :rules="rulesLogin.usuario"
+              >
                 <template v-slot:append>
-                  <q-icon name="people" color="primary" />
+                  <q-icon
+                    name="people"
+                    color="primary"
+                  />
                 </template>
               </q-input>
-              <q-input filled v-model="formulario.contrasena" label="Contraseña" lazy-rules square
-                :type="isPwd ? 'password' : 'text'" :rules="rulesLogin.contrasena">
+              <q-input
+                filled
+                v-model="formulario.contrasena"
+                label="Contraseña"
+                lazy-rules
+                square
+                :type="isPwd ? 'password' : 'text'"
+                :rules="rulesLogin.contrasena"
+              >
                 <template v-slot:append>
-                  <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd"
-                    color="primary" />
+                  <q-icon
+                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="isPwd = !isPwd"
+                    color="primary"
+                  />
                 </template>
               </q-input>
-              <q-btn color="primary" type="submit" size="16px" padding="10px" no-caps class="full-width q-ma-md"
-                label="Continuar" />
+              <q-btn
+                color="primary"
+                type="submit"
+                size="16px"
+                padding="10px"
+                no-caps
+                class="full-width q-ma-md"
+                label="Ingresar"
+              />
               <div class="text-center">ó</div>
-              <q-btn color="secondary" size="16px" padding="10px" no-caps class="full-width q-ma-md"
-                label="Continuar con Ciudadania" />
+              <q-btn
+                color="secondary"
+                size="16px"
+                padding="10px"
+                no-caps
+                class="full-width q-ma-md"
+                label="Ingresar con Ciudadania"
+              />
             </q-form>
           </q-card-section>
         </q-card>
@@ -67,7 +102,7 @@ export default {
       await _auth.login({ usuario: formulario.usuario, contrasena: formulario.contrasena })
     }
 
-    const loginCiudadania = async () => {}
+    const loginCiudadania = async () => { }
 
     return {
       login,

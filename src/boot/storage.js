@@ -24,7 +24,7 @@ const storage = {
     return this.exist(codificar('usuario'))
   },
   removeUsuario () {
-    this.remove(codificar('usuario'))
+    this.remove('usuario')
   },
   remove (key) {
     localStorage.removeItem(codificar(`${prefix}_${key}`))

@@ -35,11 +35,12 @@ export default boot(({ app, router, store }) => {
       }
       router.push(rutaInicial)
     } catch (error) {
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-      console.log(error)
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-      const { data } = error.response
-      _message.error(data.mensaje)
+      let mensaje = 'Ocurrio un error desconocido.'
+      if (error.response) {
+        const { data } = error.response
+        mensaje = data.mensaje
+      }
+      _message.error(mensaje)
     }
   }
 
@@ -63,6 +64,10 @@ export default boot(({ app, router, store }) => {
     _store.commit('global/setRoles', [])
     _store.commit('global/setMenu', [])
     _store.commit('global/setPermisos', [])
+    if (!_storage.get('login_local')) {
+      logoutCiudadania()
+    }
+    _storage.remove('login_local')
     router.push('/')
   }
 

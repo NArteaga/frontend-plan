@@ -207,8 +207,8 @@ export default defineComponent({
     const leftDrawerOpen = ref(false)
     const store = useStore()
 
-    const logout = () => {
-      _auth.logout()
+    const logout = async () => {
+      await _auth.logout()
     }
 
     return {

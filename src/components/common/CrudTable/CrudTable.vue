@@ -63,13 +63,12 @@
             v-if="enableSearch"
             class="full-width"
           >
-            <div class="row q-col-gutter-xs no-padding full-width">
+            <div class="row q-col-gutter-md no-padding full-width">
               <div
                 v-for="(item, index) of filters"
                 :key="index"
                 align="center"
                 class="col-grow"
-                style="max-width:280px;"
               >
                 <q-select
                   v-if="item.type === 'select'"
@@ -126,7 +125,7 @@
                         v-model="search[item.field]"
                         color="primary"
                         mask="YYYY-MM-DD"
-                        @input="(evt) => ocultarPopup(evt, item.field)"
+                        @update:model-value="$refs[item.field].hide()"
                       />
                     </q-popup-proxy>
                   </template>
@@ -158,7 +157,7 @@
 </template>
 
 <script>
-import { nextTick, watch } from 'vue'
+import { nextTick, ref, inject, reactive, watch, onMounted, computed } from 'vue'
 
 export default {
   name: 'CrudTable',
@@ -185,100 +184,39 @@ export default {
     }
   },
   setup (props) {
-    console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-    console.log(props)
-    console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-    watch(props.url, (value) => {
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-      console.log(value.value)
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+    const _http = inject('http')
+    const urlCrud = ref(props.url)
+    const loading = ref(false)
+    const search = ref({})
+    const enableSearch = ref('')
+    const registros = ref([])
+    const pagination = reactive({
+      sortBy: props.order,
+      descending: true,
+      page: 1,
+      rowsPerPage: 10,
+      rowsNumber: 0,
+      'rows-per-page-label': 'Páginas'
+    })
+    const division = ref(12)
+    const tamanioColumna = ref(12)
+    const crudTableModal = ref(false)
+
+    onMounted(() => {
+      division.value = parseInt(props.filters.length / 12)
+      tamanioColumna.value = division.value > 1 ? division.value : 2
+      updateList()
     })
 
-    return {
-    }
-  },
-  data () {
-    return {
-      tamanioColumna: 3,
-      registros: [],
-      persistent: false,
-      enableSearch: false,
-      crudTableModal: false,
-      search: '',
-      page: 1,
-      limit: 5,
-      edit: false,
-      loading: false,
-      selected: [],
-      pagination: {
-        sortBy: this.order,
-        descending: true,
-        page: 1,
-        rowsPerPage: 10,
-        rowsNumber: 0,
-        'rows-per-page-label': 'Páginas'
-      }
-    }
-  },
-  watch: {
-    url: {
-      async handler () {
-        this.getData({
-          pagination: this.pagination,
-          filter: undefined
-        })
-      }
-    },
-    search: {
-      handler () {
-        this.getData({
-          pagination: this.pagination,
-          filter: undefined
-        })
-      },
-      deep: true
-    }
-  },
-  mounted () {
-    const division = parseInt(this.filters.length / 12)
-    this.tamanioColumna = division > 1 ? division : 2
-    this.updateList()
-  },
-  computed: {
-    getColumns () {
-      const items = []
-      for (const el of this.columns) {
-        el.align = 'center'
-        items.push(el)
-      }
-      return items
-    }
-  },
-  methods: {
-    getPaginationLabel (firstRowIndex, endRowIndex, totalRowsNumber) {
-      return `${firstRowIndex} - ${endRowIndex} de ${totalRowsNumber}`
-    },
-    ocultarPopup (evt, field) {
-      this.$refs[field][0].hide()
-    },
-    updateList () {
-      this.getData({
-        pagination: this.pagination,
+    const updateList = () => {
+      getData({
+        pagination: pagination,
         filter: undefined
       })
-    },
-    openModal () {
-      this.crudTableModal = true
-    },
-    closeModal () {
-      this.crudTableModal = false
-    },
-    toggleSearch () {
-      this.enableSearch = !this.enableSearch
-      this.search = {}
-    },
-    async getData (props) {
-      this.loading = true
+    }
+
+    const getData = async (props) => {
+      loading.value = true
       const { page, rowsPerPage, sortBy, descending } = props.pagination
       const query = {
         limit: rowsPerPage === 0 ? 99999 : rowsPerPage,
@@ -287,25 +225,71 @@ export default {
       if (sortBy) {
         query.order = (descending ? '-' : '') + sortBy
       }
-      if (Object.keys(this.search).length) {
-        for (const key of Object.keys(this.search)) {
-          if (this.search[key]) {
-            if (this.search[key].toString().length > 0) {
-              query[key] = this.search[key]
+
+      if (Object.keys(search.value).length) {
+        for (const key of Object.keys(search.value)) {
+          if (search.value[key]) {
+            if (search.value[key].toString().length > 0) {
+              query[key] = search.value[key]
             }
           }
         }
       }
-      const url = this.url
-      const response = await this.$http.get(this.$http.convertQuery(url, query), false)
+      const response = await _http.get(_http.convertQuery(urlCrud.value, query), false)
       nextTick(() => {
-        this.loading = false
+        loading.value = false
       })
       if (response) {
-        this.registros = response.rows
-        this.pagination = props.pagination
-        this.pagination.rowsNumber = response.count
+        registros.value = response.rows
+        pagination.value = props.pagination
+        pagination.rowsNumber = response.count
       }
+    }
+
+    const toggleSearch = () => {
+      enableSearch.value = !enableSearch.value
+      search.value = {}
+    }
+
+    const getColumns = computed(() => {
+      const items = []
+      for (const el of props.columns) {
+        el.align = 'center'
+        items.push(el)
+      }
+      return items
+    })
+
+    const getPaginationLabel = (firstRowIndex, endRowIndex, totalRowsNumber) => {
+      return `${firstRowIndex} - ${endRowIndex} de ${totalRowsNumber}`
+    }
+
+    watch(() => { return { ...search.value } }, async (value) => {
+      await getData({
+        pagination: pagination,
+        filter: undefined
+      })
+    })
+
+    return {
+      persistent: ref(true),
+      search,
+      enableSearch,
+      registros,
+      pagination,
+      urlCrud,
+      getColumns,
+      page: ref(1),
+      limit: ref(5),
+      loading,
+      crudTableModal,
+      selected: ref([]),
+      getData,
+      toggleSearch,
+      updateList,
+      openModal: () => { crudTableModal.value = true },
+      closeModal: () => { crudTableModal.value = true },
+      getPaginationLabel
     }
   }
 }

@@ -4,16 +4,86 @@
       titulo="Holas"
       icono="home"
     ></Titulo>
-    <q-card class="q-mx-md">
-      <q-card-section>
-        <CrudTable
-          :filters="[]"
-          :columns="[]"
-          :url="'/system/usuarios'"
-          :order="'createdAt'"
-        ></CrudTable>
-      </q-card-section>
-    </q-card>
+    <q-input
+      v-model="demo"
+      label="algo"
+      filled
+      @update:model-value="actualizacion"
+    >
+
+    </q-input>
+    <CrudTable
+      :filters="filters"
+      :columns="columns"
+      :url="'/system/usuarios'"
+      :order="'createdAt'"
+    >
+      <template v-slot:buttons="props">
+        <q-btn
+          icon="add"
+          color="secondary"
+          @click="openModal(props.open)"
+        > Agregar
+        </q-btn>
+      </template>
+      <template v-slot:row="props">
+        <q-tr>
+          <q-td>
+            <q-btn
+              class="q-pa-xs"
+              flat
+              round
+              icon="fact_check"
+              @click="openModalComponentes(props.row)"
+            />
+            <q-btn
+              class="q-pa-xs"
+              flat
+              round
+              icon="edit"
+              @click="openModal(props.open, props.row.id)"
+            />
+            <q-btn
+              class="q-pa-xs"
+              flat
+              round
+              color="negative"
+              icon="delete"
+              @click="eliminar(props.update, props.row.id)"
+            />
+          </q-td>
+          <q-td>
+            <q-toggle
+              v-model="props.row.estado"
+              color="primary"
+              false-value="INACTIVO"
+              true-value="ACTIVO"
+              @click="cambiarEstado(props.update, props.row)"
+            />
+          </q-td>
+          <q-td>{{ props.row.nombre }}</q-td>
+          <q-td>{{ props.row.sigla }}</q-td>
+          <q-td>{{ props.row.direccion }}</q-td>
+          <q-td>{{ props.row.telefono }}</q-td>
+          <q-td>
+            <q-chip
+              v-if="props.row.estado === 'ACTIVO'"
+              square
+              color="info"
+              text-color="white"
+              label="ACTIVO"
+            />
+            <q-chip
+              v-if="props.row.estado === 'INACTIVO'"
+              square
+              color="warning"
+              text-color="white"
+              label="INACTIVO"
+            />
+          </q-td>
+        </q-tr>
+      </template>
+    </CrudTable>
   </q-page>
 </template>
 
@@ -21,10 +91,39 @@
 import { ref, reactive, watch, computed } from 'vue'
 import CrudTable from '@components/common/CrudTable/CrudTable'
 
+const filters = [
+  {
+    label: 'Nombre',
+    field: 'nombre',
+    type: 'input'
+  },
+  {
+    label: 'Fecha',
+    field: 'fecha',
+    type: 'date'
+  },
+  {
+    label: 'Fecha2',
+    field: 'fecha2',
+    type: 'date'
+  }
+
+]
+
+const columns = [
+  {
+    name: 'acciones',
+    label: 'Acciones',
+    sortable: false
+  }
+]
+
 export default {
   components: { CrudTable },
   name: 'PageIndex',
   setup () {
+    const demo = ref('')
+
     const modalCite = ref(false)
     const step = ref(0)
     const modalIop = ref(false)
@@ -103,7 +202,15 @@ export default {
       }
     }
 
+    const actualizacion = () => {
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+      console.log('EJEMPLO')
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+    }
     return {
+      actualizacion,
+      demo,
+      filters,
       configIop,
       urlConsumo,
       urlEstado,
@@ -117,7 +224,8 @@ export default {
       openModalIop,
       closeModalIop,
       modalCite,
-      formulario
+      formulario,
+      columns
     }
   }
 }

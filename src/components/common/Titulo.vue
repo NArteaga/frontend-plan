@@ -36,8 +36,6 @@ export default {
     }
   },
   setup (props) {
-    console.log('DESDE EL COMPONENTE')
-    console.log(props)
   }
 }
 </script>

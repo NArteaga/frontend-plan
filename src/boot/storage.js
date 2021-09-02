@@ -15,10 +15,14 @@ const decodificar = (value) => {
 
 const storage = {
   get (keyName) {
-    if (localStorage.getItem(codificar(`${prefix}_${keyName}`))) {
-      return JSON.parse(decodificar(localStorage.getItem(codificar(`${prefix}_${keyName}`))))
+    try {
+      if (localStorage.getItem(codificar(`${prefix}_${keyName}`))) {
+        return JSON.parse(decodificar(localStorage.getItem(codificar(`${prefix}_${keyName}`))))
+      }
+      return null
+    } catch (error) {
+      return decodificar(localStorage.getItem(codificar(`${prefix}_${keyName}`)))
     }
-    return null
   },
   existUsuario () {
     return this.exist(codificar('usuario'))
@@ -43,10 +47,14 @@ const storage = {
   },
   exist (keyName) {
     const existe = localStorage.getItem(codificar(`${prefix}_${keyName}`))
-    if (existe) {
-      return JSON.parse(decodificar(existe))
-    } else {
-      return false
+    try {
+      if (existe) {
+        return JSON.parse(decodificar(existe))
+      } else {
+        return false
+      }
+    } catch (error) {
+      return decodificar(existe)
     }
   },
   clearAll () {

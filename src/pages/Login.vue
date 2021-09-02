@@ -65,6 +65,7 @@
                 no-caps
                 class="full-width q-ma-md"
                 label="Ingresar con Ciudadania"
+                @click="loginCiudadania"
               />
             </q-form>
           </q-card-section>
@@ -102,7 +103,9 @@ export default {
       await _auth.login({ usuario: formulario.usuario, contrasena: formulario.contrasena })
     }
 
-    const loginCiudadania = async () => { }
+    const loginCiudadania = async () => {
+      await _auth.loginCiudadania()
+    }
 
     return {
       login,

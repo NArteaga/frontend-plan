@@ -44,18 +44,30 @@ export default boot(({ app, router, store }) => {
     }
   }
 
-  const loginCiudadania = () => {
-    _storage.set('login_local', false)
+  const loginCiudadania = async () => {
+    const { data } = await _axios.get(`${process.env.BACKEND_URL}/codigo`)
+    if (data.codigo) {
+      _storage.set('oauth2_state', data.codigo || null)
+      window.location.href = data.url
+    }
   }
 
-  const logout = () => {
-    cleanStore()
+  const logout = async () => {
+    const codigo = _storage.get('oauth2_state')
+    const usuario = _storage.get('usuario')
+    try {
+      if (codigo && usuario) {
+        const { data } = await _axios.post(`${process.env.BACKEND_URL}/logout`, { usuario, codigo })
+        _storage.set('login_local', false)
+        window.location.href = data.url
+      }
+    } catch (error) {
+    }
   }
 
   const logoutCiudadania = () => {}
 
   const cleanStore = () => {
-    _storage.removeUsuario()
     _storage.remove('roles')
     _storage.remove('menu')
     _storage.remove('permisos')
@@ -67,6 +79,7 @@ export default boot(({ app, router, store }) => {
     if (!_storage.get('login_local')) {
       logoutCiudadania()
     }
+    _storage.removeUsuario()
     _storage.remove('login_local')
     router.push('/')
   }

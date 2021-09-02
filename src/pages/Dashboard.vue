@@ -4,14 +4,6 @@
       titulo="Holas"
       icono="home"
     ></Titulo>
-    <q-input
-      v-model="demo"
-      label="algo"
-      filled
-      @update:model-value="actualizacion"
-    >
-
-    </q-input>
     <CrudTable
       :filters="filters"
       :columns="columns"
@@ -61,10 +53,10 @@
               @click="cambiarEstado(props.update, props.row)"
             />
           </q-td>
-          <q-td>{{ props.row.nombre }}</q-td>
-          <q-td>{{ props.row.sigla }}</q-td>
-          <q-td>{{ props.row.direccion }}</q-td>
-          <q-td>{{ props.row.telefono }}</q-td>
+          <q-td>{{ getNombreCompleto(props.row) }}</q-td>
+          <q-td>{{ props.row.numeroDocumento }}</q-td>
+          <q-td>{{ props.row.correoElectronico }}</q-td>
+          <q-td>{{ props.row.cargo }}</q-td>
           <q-td>
             <q-chip
               v-if="props.row.estado === 'ACTIVO'"
@@ -88,7 +80,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import CrudTable from '@components/common/CrudTable/CrudTable'
 
 const filters = [
@@ -115,12 +107,42 @@ const columns = [
     name: 'acciones',
     label: 'Acciones',
     sortable: false
+  },
+  {
+    name: 'activo',
+    label: 'Activo',
+    sortable: false
+  },
+  {
+    name: 'nombreCompleto',
+    label: 'Nombre completo',
+    sortable: false
+  },
+  {
+    name: 'numeroDocumento',
+    label: 'Numero de documento',
+    sortable: false
+  },
+  {
+    name: 'correoElectronico',
+    label: 'Correo electronico',
+    sortable: false
+  },
+  {
+    name: 'cargo',
+    label: 'Cargo',
+    sortable: false
+  },
+  {
+    name: 'estado',
+    label: 'Estado',
+    sortable: false
   }
 ]
 
 export default {
   components: { CrudTable },
-  name: 'PageIndex',
+  name: 'Dashboard',
   setup () {
     const demo = ref('')
 
@@ -150,79 +172,18 @@ export default {
       entidad: null
     })
 
-    const instituciones = [
-      {
-        nombre: 'Ministerio de Justicia y Transparencia Institucional',
-        sigla: 'MJTI'
-      },
-      {
-        nombre: 'Ministerio de trabajo',
-        sigloa: 'MT'
-      },
-      {
-        nombre: 'Agencia de Gobierno Electronico y Tecnologias de Información y Comunicación.',
-        sigla: 'AGETIC'
-      }
-
-    ]
-
-    const openModalIop = () => { modalIop.value = true }
-    const closeModalIop = () => { modalIop.value = false }
-
-    const openModal = () => {
-      modalCite.value = true
-    }
-    const cancelar = () => {
-      modalCite.value = false
+    const getNombreCompleto = (usuario) => {
+      return `${usuario.nombres} ${usuario.primerApellido} ${usuario.segundoApellido}`
     }
 
-    const urlConsumo = computed(() => `${configIop.urlServicio}${configIop.rutaConsumo}`)
-    const urlEstado = computed(() => `${configIop.urlServicio}${configIop.urlEstado}`)
-
-    watch(() => { return { nombre: formulario.nombre, entidad: formulario.entidad, anual: formulario.anual } }, (value) => {
-      formulario.cite = `${value.entidad}-${generarCodigoCite(value.nombre)}-{incrementable}${formulario.anual ? '-{año}' : ''}`
-    })
-
-    const generarCodigoCite = (cadena) => {
-      try {
-        cadena = cadena.replace(/[^a-zA-Z ]/g, '')
-        const str = cadena.toUpperCase()
-        const respuesta = str.split(' ')
-        let abreviacion = ''
-        for (let i = 0; i < respuesta.length; i++) {
-          if (respuesta[i] !== 'DE' && respuesta[i] !== 'PARA' && respuesta[i] !== 'Y' && respuesta[i] !== 'LA' && respuesta[i] !== 'QUE') {
-            if (respuesta[i][0]) {
-              abreviacion = abreviacion + respuesta[i][0]
-            }
-          }
-        }
-        return abreviacion
-      } catch (error) {
-        return error
-      }
-    }
-
-    const actualizacion = () => {
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-      console.log('EJEMPLO')
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-    }
     return {
-      actualizacion,
+      getNombreCompleto,
       demo,
       filters,
       configIop,
-      urlConsumo,
-      urlEstado,
       stepIop,
       modalIop,
       step,
-      instituciones,
-      generarCodigoCite,
-      openModal,
-      cancelar,
-      openModalIop,
-      closeModalIop,
       modalCite,
       formulario,
       columns

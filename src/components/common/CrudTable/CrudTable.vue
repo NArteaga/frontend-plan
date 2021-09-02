@@ -123,7 +123,7 @@
                     >
                       <q-date
                         v-model="search[item.field]"
-                        color="primary"
+                        color="secondary"
                         mask="YYYY-MM-DD"
                         @update:model-value="$refs[item.field].hide()"
                       />

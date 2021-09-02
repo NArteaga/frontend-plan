@@ -2,10 +2,14 @@ import { boot } from 'quasar/wrappers'
 const prefix = 'app'
 
 const codificar = (value) => {
+  if (process.env.NODE_ENV === 'development') return value
+
   return window.btoa(value)
 }
 
 const decodificar = (value) => {
+  if (process.env.NODE_ENV === 'development') return value
+
   return window.atob(value)
 }
 

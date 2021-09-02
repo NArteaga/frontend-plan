@@ -1,27 +1,35 @@
 import { boot } from 'quasar/wrappers'
 const prefix = 'app'
 
+const codificar = (value) => {
+  return window.btoa(value)
+}
+
+const decodificar = (value) => {
+  return window.atob(value)
+}
+
 const storage = {
   get (keyName) {
-    if (localStorage.getItem(`${prefix}_${keyName}`)) {
-      return JSON.parse(localStorage.getItem(`${prefix}_${keyName}`))
+    if (localStorage.getItem(codificar(`${prefix}_${keyName}`))) {
+      return JSON.parse(decodificar(localStorage.getItem(codificar(`${prefix}_${keyName}`))))
     }
     return null
   },
   existUsuario () {
-    return this.exist('usuario')
+    return this.exist(codificar('usuario'))
   },
   removeUsuario () {
-    this.remove('usuario')
+    this.remove(codificar('usuario'))
   },
   remove (key) {
-    localStorage.removeItem(`${prefix}_${key}`)
+    localStorage.removeItem(codificar(`${prefix}_${key}`))
   },
   destroy (key) {
-    this.remove(`${prefix}_${key}`)
+    this.remove(codificar(`${prefix}_${key}`))
   },
   set (keyName, keyValue) {
-    localStorage.setItem(`${prefix}_${keyName}`, JSON.stringify(keyValue))
+    localStorage.setItem(codificar(`${prefix}_${keyName}`), codificar(JSON.stringify(keyValue)))
   },
   setUsuario (usuario) {
     this.set('usuario', usuario)
@@ -30,9 +38,9 @@ const storage = {
     return this.get('usuario')
   },
   exist (keyName) {
-    const existe = localStorage.getItem(`${prefix}_${keyName}`)
+    const existe = localStorage.getItem(codificar(`${prefix}_${keyName}`))
     if (existe) {
-      return JSON.parse(existe)
+      return JSON.parse(decodificar(existe))
     } else {
       return false
     }

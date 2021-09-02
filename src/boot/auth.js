@@ -3,14 +3,15 @@ import { boot } from 'quasar/wrappers'
 const AUTH_URL = process.env.AUTH_URL
 
 export default boot(({ app, router, store }) => {
-  const _http = app.config.globalProperties.$http
+  const _axios = app.config.globalProperties.$axios
   const _storage = app.config.globalProperties.$storage
   const _store = store
   const _message = app.config.globalProperties.$message
 
   const login = async (params) => {
     try {
-      const respuesta = await _http.post(`${AUTH_URL}/login`, params)
+      const { data } = await _axios.post(`${AUTH_URL}/login`, params)
+      const respuesta = data.datos
       const usuario = {
         usuario: respuesta.usuario,
         nombres: respuesta.nombres,
@@ -25,6 +26,7 @@ export default boot(({ app, router, store }) => {
       _storage.set('menu', respuesta.menu)
       _storage.set('permisos', respuesta.permisos)
       _storage.set('token', respuesta.token)
+      _storage.set('login_local', true)
 
       initStore()
       let rutaInicial = '/app/'
@@ -33,19 +35,26 @@ export default boot(({ app, router, store }) => {
       }
       router.push(rutaInicial)
     } catch (error) {
-      _message.error(error.mensaje)
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+      console.log(error)
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+      const { data } = error.response
+      _message.error(data.mensaje)
     }
   }
 
   const loginCiudadania = () => {
+    _storage.set('login_local', false)
   }
 
-  const logout = () => {}
+  const logout = () => {
+    cleanStore()
+  }
 
   const logoutCiudadania = () => {}
 
   const cleanStore = () => {
-    _storage.removeUssuario()
+    _storage.removeUsuario()
     _storage.remove('roles')
     _storage.remove('menu')
     _storage.remove('permisos')
@@ -54,7 +63,7 @@ export default boot(({ app, router, store }) => {
     _store.commit('global/setRoles', [])
     _store.commit('global/setMenu', [])
     _store.commit('global/setPermisos', [])
-    router.push('/login')
+    router.push('/')
   }
 
   const initStore = () => {

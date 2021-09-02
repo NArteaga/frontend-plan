@@ -1,28 +1,44 @@
 <template>
   <div class="row">
     <div class="col-xs-12">
-      <q-dialog v-model="crudTableModal" persistent>
+      <q-dialog
+        v-model="crudTableModal"
+        persistent
+      >
         <slot
           name="form"
           :close="closeModal"
-          :update="updateList">Agregue su formulario aquí</slot>
+          :update="updateList"
+        >Agregue su formulario aquí</slot>
       </q-dialog>
     </div>
     <div class="col-xs-12">
       <q-card class="q-ma-md">
-        <q-toolbar inset class="q-gutter-md q-px-md q-pb-md">
-          <slot name="buttons" :open="openModal"></slot>
+        <q-toolbar
+          inset
+          class="q-gutter-md q-px-md q-pb-md"
+        >
+          <slot
+            name="buttons"
+            :open="openModal"
+          ></slot>
           <q-btn
             v-if="filters.length > 0"
-            @click="toggleSearch()">
+            @click="toggleSearch()"
+          >
             <q-icon
               center
               :name="enableSearch ? 'close' : 'search'"
-              color="secondary" />
+              color="secondary"
+            />
             <q-tooltip>{{ enableSearch ? 'Cerrar filtros' : 'Abrir filtros' }}</q-tooltip>
           </q-btn>
           <q-btn @click="updateList()">
-            <q-icon center name="refresh" color="secondary" />
+            <q-icon
+              center
+              name="refresh"
+              color="secondary"
+            />
             <q-tooltip>Actualizar página</q-tooltip>
           </q-btn>
           <slot name="buttons-end"></slot>
@@ -40,17 +56,21 @@
           loading-label="Cargando..."
           rows-per-page-label="Filas por pagina"
           v-model:selected="selected"
-          @request="getData">
+          @request="getData"
+        >
           <template
-            v-slot:top v-if="enableSearch"
-            class="full-width">
+            v-slot:top
+            v-if="enableSearch"
+            class="full-width"
+          >
             <div class="row q-col-gutter-xs no-padding full-width">
               <div
                 v-for="(item, index) of filters"
                 :key="index"
                 align="center"
                 class="col-grow"
-                style="max-width:280px;">
+                style="max-width:280px;"
+              >
                 <q-select
                   v-if="item.type === 'select'"
                   v-model="search[item.field]"
@@ -62,14 +82,16 @@
                   dense
                   emit-value
                   map-options
-                  :autofocus="index === 0" />
+                  :autofocus="index === 0"
+                />
                 <q-checkbox
                   v-if="item.type === 'checkbox'"
                   v-model="search[item.field]"
                   :label="item.label"
                   filled
                   dense
-                  :autofocus="index === 0" />
+                  :autofocus="index === 0"
+                />
                 <q-input
                   v-if="item.type === 'input'"
                   v-model="search[item.field]"
@@ -77,25 +99,35 @@
                   clearable
                   filled
                   dense
-                  :autofocus="index === 0" />
-                 <q-input
+                  :autofocus="index === 0"
+                />
+                <q-input
                   v-if="item.type === 'date'"
                   v-model="search[item.field]"
                   :label="item.label"
                   clearable
                   filled
-                  dense>
-                  <template v-slot:append :props="item">
-                    <q-icon name="event" class="cursor-pointer"></q-icon>
+                  dense
+                >
+                  <template
+                    v-slot:append
+                    :props="item"
+                  >
+                    <q-icon
+                      name="event"
+                      class="cursor-pointer"
+                    ></q-icon>
                     <q-popup-proxy
                       :ref="item.field"
                       transition-show="scale"
-                      transition-hide="scale">
+                      transition-hide="scale"
+                    >
                       <q-date
                         v-model="search[item.field]"
                         color="primary"
                         mask="YYYY-MM-DD"
-                        @input="(evt) => ocultarPopup(evt, item.field)" />
+                        @input="(evt) => ocultarPopup(evt, item.field)"
+                      />
                     </q-popup-proxy>
                   </template>
                 </q-input>
@@ -107,7 +139,8 @@
               :row="props.row"
               :open="openModal"
               :update="updateList"
-              name="row" />
+              name="row"
+            />
           </template>
           <template v-slot:item="props">
             <slot
@@ -115,7 +148,8 @@
               :selected="props.selected"
               :open="openModal"
               :update="updateList"
-              name="item" />
+              name="item"
+            />
           </template>
         </q-table>
       </q-card>
@@ -124,10 +158,10 @@
 </template>
 
 <script>
-import { nextTick } from 'vue'
+import { nextTick, watch } from 'vue'
 
 export default {
-  name: 'PageIndex',
+  name: 'CrudTable',
   props: {
     filters: {
       type: Array,
@@ -148,6 +182,19 @@ export default {
     grid: {
       type: Boolean,
       default: false
+    }
+  },
+  setup (props) {
+    console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+    console.log(props)
+    console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+    watch(props.url, (value) => {
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+      console.log(value.value)
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+    })
+
+    return {
     }
   },
   data () {

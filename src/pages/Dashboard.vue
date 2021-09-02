@@ -1,12 +1,15 @@
 <template>
   <q-page>
-    <Titulo titulo="Holas" icono="home"></Titulo>
+    <Titulo
+      titulo="Holas"
+      icono="home"
+    ></Titulo>
     <q-card class="q-mx-md">
       <q-card-section>
         <CrudTable
           :filters="[]"
           :columns="[]"
-          :url="'system/usuarios'"
+          :url="'/system/usuarios'"
           :order="'createdAt'"
         ></CrudTable>
       </q-card-section>

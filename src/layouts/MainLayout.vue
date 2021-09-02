@@ -3,30 +3,160 @@
 
     <q-header :class="{ 'bg-primary': ! $q.dark.isActive, 'q-dark': $q.dark.isActive }">
       <q-toolbar>
-        <q-btn dense flat round icon="menu" :color="!$q.dark.isActive ? 'black' : ''" @click="toggleLeftDrawer" />
+        <q-btn
+          dense
+          flat
+          round
+          icon="menu"
+          :color="!$q.dark.isActive ? 'black' : ''"
+          @click="toggleLeftDrawer"
+        />
         <q-space />
         <q-space />
-        <q-toggle v-model="darkMode" icon="dark_mode" @click="darkModeChange" />
+        <q-toggle
+          v-model="darkMode"
+          icon="dark_mode"
+          @click="darkModeChange"
+        />
+        <q-item
+          clickable
+          v-ripple
+        >
+          <q-item-section v-if="usuario">
+            <q-avatar
+              color="secondary text-white"
+              v-if="usuario.usuario"
+            >
+              {{
+                  usuario?.foto_perfil
+                    ? ""
+                    : usuario.usuario.toUpperCase().charAt(0)
+                }}
+              <img
+                v-if="usuario.foto_perfil"
+                :src="`${rutaImagen}/Src/Uploads/${usuario.foto_perfil}`"
+                style="max-width: 80px"
+              />
+            </q-avatar>
+          </q-item-section>
+          <q-menu
+            anchor="bottom right"
+            self="top right"
+          >
+            <q-list style="min-width: 300px">
+              <q-item class="text-secondary">
+                <q-item-section>
+                  <div class="row">
+                    <div class="col-xs-2 column justify-center">
+                      <q-avatar
+                        color="primary text-white"
+                        style="vertical-align: middle"
+                        v-if="usuario.usuario"
+                      >
+                        {{
+                            usuario.foto_perfil
+                              ? ""
+                              : usuario.usuario.toUpperCase().charAt(0)
+                          }}
+                        <img
+                          v-if="usuario.foto_perfil"
+                          :src="`${rutaImagen}/Src/Uploads/${usuario.foto_perfil}`"
+                          style="max-width: 80px"
+                        />
+                      </q-avatar>
+                    </div>
+                    <div class="col-xs-10 q-pl-md">
+                      <p class="text-h6">
+
+                      </p>
+                      <p class="text-weight-regular">
+                        <q-icon name="people" /> {{ usuario.usuario }}
+                      </p>
+                      <p class="text-weight-regular">
+                        <q-icon name="email" />
+                        {{ usuario.correoElectronico }}
+                      </p>
+                    </div>
+                  </div>
+                </q-item-section>
+              </q-item>
+              <q-item
+                clickable
+                v-ripple
+                @click="$router.replace('/app/perfil')"
+              >
+                <q-item-section avatar>
+                  <q-icon
+                    color="primary"
+                    name="person_outline"
+                  />
+                </q-item-section>
+                <q-item-section>Mi cuenta</q-item-section>
+              </q-item>
+              <q-item
+                clickable
+                v-ripple
+                v-close-popup
+                @click="logout"
+              >
+                <q-item-section avatar>
+                  <q-icon
+                    color="primary"
+                    name="exit_to_app"
+                  />
+                </q-item-section>
+                <q-item-section>Cerrar sesión</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-item>
       </q-toolbar>
-      <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered :breakpoint="700" class="aside-dark"
-        :width="250">
+      <q-drawer
+        show-if-above
+        v-model="leftDrawerOpen"
+        side="left"
+        bordered
+        :breakpoint="700"
+        class="aside-dark"
+        :width="250"
+      >
         <div class="text-center">
           <p class="text-white text-h6">
-            <q-icon name="dashboard" size="sm" /> Frontend base
+            <q-icon
+              name="dashboard"
+              size="sm"
+            /> Frontend base
           </p>
           <div class="text-center q-pa-md">
-            <q-avatar v-if="usuario?.nombres" size="64px" font-size="42px" color="info" text-color="white">
+            <q-avatar
+              v-if="usuario?.nombres"
+              size="64px"
+              font-size="42px"
+              color="info"
+              text-color="white"
+            >
               {{ usuario?.nombres[0]?.toUpperCase() }}
             </q-avatar>
             <div class="text-weight-bold text-white q-mt-sm">{{ usuario?.nombres }}</div>
             <div>{{ usuario?.correoElectronico }}</div>
           </div>
         </div>
-        <q-list padding v-if="menu.length">
-          <q-item-label header class="text-white ">Menu</q-item-label>
-          <q-item v-for="item in menu" :key="item.ruta"
+        <q-list
+          padding
+          v-if="menu.length"
+        >
+          <q-item-label
+            header
+            class="text-white"
+          >Menu</q-item-label>
+          <q-item
+            v-for="item in menu"
+            :key="item.ruta"
             :active="($route.path.includes(item.ruta) && item.ruta !== '') || (item.ruta === '' && $route.path === '/')"
-            clickable v-ripple @click="$router.push(`/app/${item.ruta}`)">
+            clickable
+            v-ripple
+            @click="$router.push(`/app/${item.ruta}`)"
+          >
             <q-item-section avatar>
               <q-icon :name="item.icono" />
             </q-item-section>
@@ -39,7 +169,10 @@
     </q-header>
 
     <q-page-container>
-      <router-view class="layout-view" style="padding-top:15px;" />
+      <router-view
+        class="layout-view"
+        style="padding-top:15px;"
+      />
     </q-page-container>
 
     <q-footer class="q-footer-main">
@@ -74,7 +207,12 @@ export default defineComponent({
     const leftDrawerOpen = ref(false)
     const store = useStore()
 
+    const logout = () => {
+      _auth.logout()
+    }
+
     return {
+      logout,
       darkMode,
       darkModeChange () {
         $q.dark.set(!$q.dark.isActive)
@@ -137,7 +275,7 @@ $height: 190px;
 
     &.q-router-link--active,
     &:hover {
-      transition: color .2s ease,background-color .2s ease;
+      transition: color 0.2s ease, background-color 0.2s ease;
       background-color: $aside-dark;
 
       .q-item__section--main {

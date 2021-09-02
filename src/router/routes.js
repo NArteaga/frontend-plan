@@ -1,12 +1,21 @@
 const _storage = window.localStorage
 const prefix = 'app'
+
+const codificar = (value) => {
+  return window.btoa(value)
+}
+
+const decodificar = (value) => {
+  return window.atob(value)
+}
+
 const guardLogin = (to, from, next) => {
-  const menu = _storage.getItem(`${prefix}_menu`)
-  if (_storage.getItem(`${prefix}_token`) && menu && _storage.getItem(`${prefix}_usuario`)) {
+  const menu = _storage.getItem(codificar(`${prefix}_menu`))
+  if (_storage.getItem(codificar(`${prefix}_token`)) && menu && _storage.getItem(codificar(`${prefix}_usuario`))) {
     if (from.path.includes('/app/')) {
-      next({ path: `${JSON.parse(menu)[0].ruta}`, replace: true })
+      next({ path: `${JSON.parse(decodificar(menu))[0].ruta}`, replace: true })
     } else {
-      next({ path: `/app/${JSON.parse(menu)[0].ruta}`, replace: true })
+      next({ path: `/app/${JSON.parse(decodificar(menu))[0].ruta}`, replace: true })
     }
   } else {
     next()
@@ -14,7 +23,7 @@ const guardLogin = (to, from, next) => {
 }
 
 const guardApp = (to, from, next) => {
-  if (_storage.getItem(`${prefix}_token`)) {
+  if (_storage.getItem(codificar(`${prefix}_token`))) {
     next()
   } else {
     _storage.clear()

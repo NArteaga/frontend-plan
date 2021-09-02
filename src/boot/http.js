@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Loading } from 'quasar'
 import { boot } from 'quasar/wrappers'
 
-const urlBase = '' // process.env.API
+const urlBase = process.env.API_URL
 const codeErrorsLogout = [401]
 const messages = {
   'jwt expired': 'La sesión caducó, ingrese otra vez al sistema'
@@ -81,11 +81,6 @@ export default boot(({ app, router, store }) => {
 
     delete (url, loading = true, headers) {
       return _http('delete', url, loading, headers)
-    },
-    login () {
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-      console.log('LOGIN')
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
     },
     convertQuery (url, query) {
       let string = []

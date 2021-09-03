@@ -138,6 +138,8 @@
               :row="props.row"
               :open="openModal"
               :update="updateList"
+              :eliminar="eliminar"
+              :cambiarEstado="cambiarEstado"
               name="row"
             />
           </template>
@@ -158,6 +160,7 @@
 
 <script>
 import { nextTick, ref, inject, reactive, watch, onMounted, computed } from 'vue'
+import { useQuasar } from 'quasar'
 
 export default {
   name: 'CrudTable',
@@ -185,6 +188,8 @@ export default {
   },
   setup (props) {
     const _http = inject('http')
+    const $q = useQuasar()
+
     const urlCrud = ref(props.url)
     const loading = ref(false)
     const search = ref({})
@@ -271,6 +276,65 @@ export default {
       })
     })
 
+    const eliminar = ({ titulo, mensaje, aceptar, cancelar, url }) => {
+      $q.dialog({
+        title: titulo || 'Confirmacion',
+        message: mensaje || '¿Realmente quiere eliminar el registro?',
+        persistent: true,
+        ok: {
+          color: 'primary',
+          label: 'Aceptar'
+        },
+        cancel: {
+          color: 'white',
+          'text-color': 'black',
+          label: 'Cancelar'
+        }
+      }).onOk(async () => {
+        if (aceptar) {
+          await aceptar()
+        } else {
+          await _http.delete(url)
+        }
+        await updateList()
+      }).onCancel(async () => {
+        if (cancelar) {
+          await cancelar()
+        }
+      })
+    }
+
+    const cambiarEstado = async ({ registro, url, titulo, mensaje, aceptar, cancelar }) => {
+      const estadoOriginal = registro.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO'
+      $q.dialog({
+        title: titulo || 'Atención',
+        message: mensaje || `Esta seguro de que quiere ${registro.estado === 'ACTIVO' ? 'activar' : 'desactivar'} este registro?`,
+        ok: {
+          color: 'primary',
+          label: 'Aceptar'
+        },
+        cancel: {
+          color: 'white',
+          'text-color': 'secondary',
+          label: 'Cancelar'
+        },
+        persistent: true
+      }).onOk(async () => {
+        if (aceptar) {
+          await aceptar()
+        } else {
+          await _http.put(url, registro)
+        }
+        await updateList()
+      }).onCancel(async () => {
+        if (cancelar) {
+          await cancelar()
+        } else {
+          registro.estado = estadoOriginal
+        }
+      })
+    }
+
     return {
       persistent: ref(true),
       search,
@@ -284,6 +348,8 @@ export default {
       loading,
       crudTableModal,
       selected: ref([]),
+      eliminar,
+      cambiarEstado,
       getData,
       toggleSearch,
       updateList,

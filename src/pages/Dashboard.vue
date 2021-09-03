@@ -138,7 +138,7 @@
 
 <script>
 import { ref, inject } from 'vue'
-import CrudTable from '@components/common/CrudTable/CrudTable'
+import CrudTable from '@components/common/CrudTable'
 
 const filters = [
   {

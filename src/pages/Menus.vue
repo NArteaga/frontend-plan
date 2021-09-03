@@ -7,7 +7,7 @@
     <CrudTable
       :filters="filters"
       :columns="columns"
-      :url="'/system/usuarios'"
+      :url="url"
       :order="'createdAt'"
     >
       <template v-slot:buttons="props">
@@ -26,7 +26,7 @@
               size="md"
             />
             <q-toolbar-title>
-              {{ usuario.id ? 'Editar' : 'Agregar' }} usuario
+              {{ menu.id ? 'Editar' : 'Agregar' }} menu
             </q-toolbar-title>
             <q-space />
             <q-btn
@@ -45,19 +45,19 @@
                 class="col-xs-12 col-md-6"
                 label="Nombre"
                 filled
-                v-model="usuario.nombres"
+                v-model="menu.nombres"
               ></q-input>
               <q-input
                 class="col-xs-12 col-md-6"
                 label="Primer Apellido"
                 filled
-                v-model="usuario.primerApellido"
+                v-model="menu.primerApellido"
               ></q-input>
               <q-input
                 class="col-xs-12 col-md-6"
                 label="Segudo Apellido"
                 filled
-                v-model="usuario.segundoApellido"
+                v-model="menu.segundoApellido"
               ></q-input>
               <div class="col-xs-12 text-right">
                 <q-btn
@@ -82,13 +82,6 @@
               class="q-pa-xs"
               flat
               round
-              icon="fact_check"
-              @click="openModalComponentes(props.row)"
-            />
-            <q-btn
-              class="q-pa-xs"
-              flat
-              round
               icon="edit"
               @click="openModal(props.open, props.row.id)"
             />
@@ -98,7 +91,7 @@
               round
               color="negative"
               icon="delete"
-              @click="eliminar(props.update, props.row.id)"
+              @click="eliminar(props, props.row.id)"
             />
           </q-td>
           <q-td>
@@ -107,13 +100,12 @@
               color="primary"
               false-value="INACTIVO"
               true-value="ACTIVO"
-              @click="cambiarEstado(props.update, props.row)"
+              @click="cambiarEstado(props, props.row)"
             />
           </q-td>
-          <q-td>{{ getNombreCompleto(props.row) }}</q-td>
-          <q-td>{{ props.row.numeroDocumento }}</q-td>
-          <q-td>{{ props.row.correoElectronico }}</q-td>
-          <q-td>{{ props.row.cargo }}</q-td>
+          <q-td>{{ props.row.nombre }}</q-td>
+          <q-td>{{ props.row.ruta }}</q-td>
+          <q-td>{{ props.row.icono }}</q-td>
           <q-td>
             <q-chip
               v-if="props.row.estado === 'ACTIVO'"
@@ -138,7 +130,7 @@
 
 <script>
 import { ref, inject } from 'vue'
-import CrudTable from '@components/common/CrudTable/CrudTable'
+import CrudTable from '@components/common/CrudTable'
 
 const filters = [
   {
@@ -171,23 +163,18 @@ const columns = [
     sortable: false
   },
   {
-    name: 'nombreCompleto',
-    label: 'Nombre completo',
+    name: 'nombre',
+    label: 'Nombre',
     sortable: false
   },
   {
-    name: 'numeroDocumento',
-    label: 'Numero de documento',
+    name: 'ruta',
+    label: 'Ruta',
     sortable: false
   },
   {
-    name: 'correoElectronico',
-    label: 'Correo electronico',
-    sortable: false
-  },
-  {
-    name: 'cargo',
-    label: 'Cargo',
+    name: 'icono',
+    label: 'Icono',
     sortable: false
   },
   {
@@ -197,21 +184,24 @@ const columns = [
   }
 ]
 
+const url = '/system/menus'
+
 export default {
   components: { CrudTable },
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
 
-    const usuario = ref({
+    const menu = ref({
       id: null,
-      nombres: '',
-      primerApellido: '',
-      segundoApellido: ''
+      nombre: '',
+      ruta: '',
+      icono: '',
+      orden: ''
     })
 
     const resetForm = () => {
-      usuario.value = {
+      menu.value = {
         id: null,
         nombres: '',
         primerApellido: '',
@@ -222,7 +212,7 @@ export default {
     const openModal = async (open, id) => {
       resetForm()
       if (id) {
-        usuario.value = await _http.get(`/system/usuarios/${id}`)
+        menu.value = await _http.get(`${url}/${id}`)
       }
       open()
     }
@@ -233,25 +223,31 @@ export default {
     }
 
     const guardar = (props) => {
-      if (usuario.value.id) {
-        _http.put(`/system/usuarios/${usuario.value.id}`, usuario.value)
+      if (menu.value.id) {
+        _http.put(`${url}/${menu.value.id}`, menu.value)
       } else {
-        _http.post('/system/usuarios', usuario.value)
+        _http.post(url, menu.value)
       }
       props.update()
       closeModal(props.close)
     }
 
-    const getNombreCompleto = (usuario) => {
-      return `${usuario.nombres} ${usuario.primerApellido} ${usuario.segundoApellido}`
+    const eliminar = async (props, id) => {
+      await props.eliminar({ url: `${url}/${id}` })
+    }
+
+    const cambiarEstado = async (props, row) => {
+      await props.cambiarEstado({ registro: row, url: `${url}/${row.id}` })
     }
 
     return {
       closeModal,
       openModal,
-      getNombreCompleto,
       guardar,
-      usuario,
+      eliminar,
+      cambiarEstado,
+      url,
+      menu,
       filters,
       columns
     }

@@ -279,7 +279,7 @@ export default {
     const eliminar = ({ titulo, mensaje, aceptar, cancelar, url }) => {
       $q.dialog({
         title: titulo || 'Confirmacion',
-        message: mensaje || '¿Realmente quiere eliminar el registro?',
+        message: mensaje || '¿Esta seguro de eliminar el registro?',
         persistent: true,
         ok: {
           color: 'primary',
@@ -307,7 +307,7 @@ export default {
     const cambiarEstado = async ({ registro, url, titulo, mensaje, aceptar, cancelar }) => {
       const estadoOriginal = registro.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO'
       $q.dialog({
-        title: titulo || 'Atención',
+        title: titulo || 'Confirmacion',
         message: mensaje || `Esta seguro de que quiere ${registro.estado === 'ACTIVO' ? 'activar' : 'desactivar'} este registro?`,
         ok: {
           color: 'primary',

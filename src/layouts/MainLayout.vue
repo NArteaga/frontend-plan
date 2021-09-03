@@ -1,7 +1,10 @@
 <template>
   <q-layout view="lHh lpR lff">
 
-    <q-header :class="{ 'bg-primary': ! $q.dark.isActive, 'q-dark': $q.dark.isActive }">
+    <q-header
+      reveal
+      :class="{ 'bg-primary': ! $q.dark.isActive, 'q-dark': $q.dark.isActive }"
+    >
       <q-toolbar>
         <q-btn
           dense

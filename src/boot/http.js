@@ -13,6 +13,14 @@ export default boot(({ app, router, store }) => {
   const Message = app.config.globalProperties.$message
   const Auth = app.config.globalProperties.$auth
 
+  const codeLogout = [401, 403, 500]
+
+  axios.interceptors.response.use(async (response) => {
+    if (codeLogout.includes(response.status)) {
+      await Auth.logout()
+    }
+    return response
+  })
   const _http = (method, url, data, loading = true, headers) => {
     return new Promise((resolve, reject) => {
       if (loading) {

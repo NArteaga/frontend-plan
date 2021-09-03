@@ -49,7 +49,11 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     beforeEnter: guardApp,
     children: [
-      { path: 'dashboard', name: 'dashboard', component: () => import('pages/Dashboard.vue') }
+      { path: 'dashboard', name: 'dashboard', component: () => import('pages/Dashboard.vue') },
+      { path: 'entidades', name: 'entidades', component: () => import('pages/Entidades.vue') },
+      { path: 'menus', name: 'menus', component: () => import('pages/Menus.vue') },
+      { path: 'roles', name: 'roles', component: () => import('pages/Roles.vue') },
+      { path: 'usuarios', name: 'usuarios', component: () => import('pages/Usuarios.vue') }
     ]
   },
   {

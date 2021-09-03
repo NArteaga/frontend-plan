@@ -288,7 +288,7 @@ export default {
       toggleSearch,
       updateList,
       openModal: () => { crudTableModal.value = true },
-      closeModal: () => { crudTableModal.value = true },
+      closeModal: () => { crudTableModal.value = false },
       getPaginationLabel
     }
   }

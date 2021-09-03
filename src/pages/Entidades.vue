@@ -1,8 +1,8 @@
 <template>
   <q-page>
     <Titulo
-      titulo="Usuarios"
-      icono="people"
+      titulo="Entidades"
+      icono="business"
     ></Titulo>
     <CrudTable
       :filters="filters"

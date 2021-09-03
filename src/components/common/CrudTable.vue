@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import { nextTick, ref, inject, reactive, watch, onMounted, computed } from 'vue'
+import { ref, inject, watch, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
 
 export default {
@@ -195,7 +195,7 @@ export default {
     const search = ref({})
     const enableSearch = ref('')
     const registros = ref([])
-    const pagination = reactive({
+    const pagination = ref({
       sortBy: props.order,
       descending: true,
       page: 1,
@@ -215,7 +215,7 @@ export default {
 
     const updateList = () => {
       getData({
-        pagination: pagination,
+        pagination: pagination.value,
         filter: undefined
       })
     }
@@ -240,15 +240,13 @@ export default {
           }
         }
       }
-      const response = await _http.get(_http.convertQuery(urlCrud.value, query), false)
-      nextTick(() => {
-        loading.value = false
-      })
-      if (response) {
-        registros.value = response.rows
+      const { rows, count } = await _http.get(_http.convertQuery(urlCrud.value, query), false)
+      if (rows) {
+        registros.value = rows
         pagination.value = props.pagination
-        pagination.rowsNumber = response.count
+        pagination.value.rowsNumber = count
       }
+      loading.value = false
     }
 
     const toggleSearch = () => {
@@ -271,7 +269,7 @@ export default {
 
     watch(() => { return { ...search.value } }, async (value) => {
       await getData({
-        pagination: pagination,
+        pagination: pagination.value,
         filter: undefined
       })
     })

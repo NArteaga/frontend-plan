@@ -45,20 +45,37 @@
                 class="col-xs-12 col-md-6"
                 label="Nombre"
                 filled
-                v-model="menu.nombres"
+                v-model="menu.nombre"
               ></q-input>
               <q-input
                 class="col-xs-12 col-md-6"
-                label="Primer Apellido"
+                label="Ruta"
                 filled
-                v-model="menu.primerApellido"
+                v-model="menu.ruta"
               ></q-input>
               <q-input
                 class="col-xs-12 col-md-6"
-                label="Segudo Apellido"
+                label="Icono"
                 filled
-                v-model="menu.segundoApellido"
-              ></q-input>
+                v-model="menu.icono"
+              />
+              <q-select
+                class="col-xs-12 col-md-6"
+                filled
+                label="Menu padre"
+                v-model="menu.idMenu"
+                :options="menus"
+                option-value="id"
+                option-label="nombre"
+                emit-value
+                map-options
+              />
+              <q-input
+                class="col-xs-12 col-md-6"
+                label="Orden"
+                filled
+                v-model="menu.orden"
+              />
               <div class="col-xs-12 text-right">
                 <q-btn
                   label="Cancelar"
@@ -76,7 +93,7 @@
         </q-card>
       </template>
       <template v-slot:row="props">
-        <q-tr>
+        <q-tr class="text-center">
           <q-td>
             <q-btn
               class="q-pa-xs"
@@ -129,7 +146,7 @@
 </template>
 
 <script>
-import { ref, inject } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import CrudTable from '@components/common/CrudTable'
 
 const filters = [
@@ -165,22 +182,22 @@ const columns = [
   {
     name: 'nombre',
     label: 'Nombre',
-    sortable: false
+    sortable: true
   },
   {
     name: 'ruta',
     label: 'Ruta',
-    sortable: false
+    sortable: true
   },
   {
     name: 'icono',
     label: 'Icono',
-    sortable: false
+    sortable: true
   },
   {
     name: 'estado',
     label: 'Estado',
-    sortable: false
+    sortable: true
   }
 ]
 
@@ -191,21 +208,29 @@ export default {
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
+    const menus = ref([])
+    onMounted(async () => {
+      const { rows } = await _http.get('/system/menus')
+      menus.value = rows
+    })
 
     const menu = ref({
       id: null,
       nombre: '',
       ruta: '',
       icono: '',
-      orden: ''
+      orden: 0,
+      estado: 'ACTIVO'
     })
 
     const resetForm = () => {
       menu.value = {
         id: null,
-        nombres: '',
-        primerApellido: '',
-        segundoApellido: ''
+        nombre: '',
+        ruta: '',
+        icono: '',
+        orden: 0,
+        estado: 'ACTIVO'
       }
     }
 
@@ -241,6 +266,7 @@ export default {
     }
 
     return {
+      menus,
       closeModal,
       openModal,
       guardar,

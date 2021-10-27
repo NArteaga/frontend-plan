@@ -209,10 +209,6 @@ export default {
       closeModal(close)
     }
 
-    const getNombreCompleto = (usuario) => {
-      return `${usuario.nombres} ${usuario.primerApellido} ${usuario.segundoApellido}`
-    }
-
     return {
       entidad,
       filters,
@@ -220,7 +216,6 @@ export default {
       url,
       closeModal,
       openModal,
-      getNombreCompleto,
       guardar
     }
   }

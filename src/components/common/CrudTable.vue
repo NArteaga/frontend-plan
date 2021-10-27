@@ -187,6 +187,7 @@ export default {
   },
   setup (props) {
     const _http = inject('http')
+    const _message = inject('message')
     const $q = useQuasar()
 
     const urlCrud = ref(props.url)
@@ -293,6 +294,7 @@ export default {
         } else {
           await _http.delete(url)
         }
+        _message.success('Eliminado de manera correcta.')
         await updateList()
       }).onCancel(async () => {
         if (cancelar) {
@@ -322,6 +324,7 @@ export default {
         } else {
           await _http.put(url, registro)
         }
+        _message.success(`Se ${registro.estado === 'ACTIVO' ? 'activo' : 'desactivo'} el registro de manera exitosa.`)
         await updateList()
       }).onCancel(async () => {
         if (cancelar) {

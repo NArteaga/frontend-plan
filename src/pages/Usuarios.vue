@@ -26,7 +26,7 @@
               size="md"
             />
             <q-toolbar-title>
-              {{ entidad.id ? 'Editar' : 'Agregar' }} usuario
+              {{ usuario.id ? 'Editar' : 'Agregar' }} usuario
             </q-toolbar-title>
             <q-space />
             <q-btn
@@ -38,7 +38,7 @@
           </q-toolbar>
           <q-card-section>
             <Usuario
-              v-model:valores="entidad"
+              v-model:valores="usuario"
               @guardar="guardar(update, close)"
               @cancelar="closeModal(close)"
             ></Usuario>
@@ -185,7 +185,7 @@ export default {
   setup () {
     const _http = inject('http')
     const url = ref('system/usuarios')
-    const entidad = ref({
+    const usuario = ref({
       cargo: null,
       celular: null,
       correoElectronico: null,
@@ -202,7 +202,7 @@ export default {
     })
 
     const resetForm = () => {
-      entidad.value = {
+      usuario.value = {
         cargo: null,
         celular: null,
         correoElectronico: null,
@@ -222,7 +222,7 @@ export default {
     const openModal = async (open, id) => {
       resetForm()
       if (id) {
-        entidad.value = await _http.get(`/${url.value}/${id}`)
+        usuario.value = await _http.get(`/${url.value}/${id}`)
       }
       open()
     }
@@ -233,10 +233,10 @@ export default {
     }
 
     const guardar = async (update, close) => {
-      if (entidad.value.id) {
-        await _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
+      if (usuario.value.id) {
+        await _http.put(`/${url.value}/${usuario.value.id}`, usuario.value)
       } else {
-        await _http.post(`/${url.value}`, entidad.value)
+        await _http.post(`/${url.value}`, usuario.value)
       }
       await update()
       closeModal(close)
@@ -247,7 +247,7 @@ export default {
     }
 
     return {
-      entidad,
+      usuario,
       filters,
       columns,
       url,

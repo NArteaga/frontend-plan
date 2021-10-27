@@ -192,13 +192,13 @@ export default {
       close()
     }
 
-    const guardar = (update, close) => {
+    const guardar = async (update, close) => {
       if (entidad.value.id) {
-        _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
+        await _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
       } else {
-        _http.post(`/${url.value}`, entidad.value)
+        await _http.post(`/${url.value}`, entidad.value)
       }
-      update()
+      await update()
       closeModal(close)
     }
 

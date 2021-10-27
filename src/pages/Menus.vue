@@ -10,19 +10,19 @@
       :url="url"
       :order="'createdAt'"
     >
-      <template v-slot:buttons="props">
+      <template v-slot:buttons="{ open }">
         <q-btn
           icon="add"
           color="secondary"
-          @click="openModal(props.open)"
-        > Agregar
-        </q-btn>
+          @click="openModal(open)"
+          label="Nuevo menu"
+        />
       </template>
-      <template v-slot:form="props">
+      <template v-slot:form="{ close, update}">
         <q-card style="width: 700px; max-width: 90vw;">
           <q-toolbar class="q-pa-md">
             <q-icon
-              name="home_work"
+              name="settings"
               size="md"
             />
             <q-toolbar-title>
@@ -33,74 +33,27 @@
               flat
               round
               icon="close"
-              @click="closeModal(props.close)"
+              @click="closeModal(close)"
             />
           </q-toolbar>
           <q-card-section>
-            <q-form
-              class="row q-col-gutter-md"
-              @submit="guardar(props)"
-            >
-              <q-input
-                class="col-xs-12 col-md-6"
-                label="Nombre"
-                filled
-                v-model="menu.nombre"
-              ></q-input>
-              <q-input
-                class="col-xs-12 col-md-6"
-                label="Ruta"
-                filled
-                v-model="menu.ruta"
-              ></q-input>
-              <q-input
-                class="col-xs-12 col-md-6"
-                label="Icono"
-                filled
-                v-model="menu.icono"
-              />
-              <q-select
-                class="col-xs-12 col-md-6"
-                filled
-                label="Menu padre"
-                v-model="menu.idMenu"
-                :options="menus"
-                option-value="id"
-                option-label="nombre"
-                emit-value
-                map-options
-              />
-              <q-input
-                class="col-xs-12 col-md-6"
-                label="Orden"
-                filled
-                v-model="menu.orden"
-              />
-              <div class="col-xs-12 text-right">
-                <q-btn
-                  label="Cancelar"
-                  @click="closeModal(props.close)"
-                />
-                <q-btn
-                  label="Guardar"
-                  type="submit"
-                  color="primary"
-                  class="q-ml-sm"
-                />
-              </div>
-            </q-form>
+            <Menu
+              v-model:valores="menu"
+              @guardar="guardar(update, close)"
+              @cancelar="closeModal(close)"
+            ></Menu>
           </q-card-section>
         </q-card>
       </template>
-      <template v-slot:row="props">
-        <q-tr class="text-center">
+      <template v-slot:row="{ row, open, eliminar, cambiarEstado }">
+        <q-tr>
           <q-td>
             <q-btn
               class="q-pa-xs"
               flat
               round
               icon="edit"
-              @click="openModal(props.open, props.row.id)"
+              @click="openModal(open, row.id)"
             />
             <q-btn
               class="q-pa-xs"
@@ -108,36 +61,35 @@
               round
               color="negative"
               icon="delete"
-              @click="eliminar(props, props.row.id)"
+              @click="eliminar({ url: `${url}/${row.id}` })"
             />
           </q-td>
           <q-td>
             <q-toggle
-              v-model="props.row.estado"
+              v-model="row.estado"
               color="primary"
               false-value="INACTIVO"
               true-value="ACTIVO"
-              @click="cambiarEstado(props, props.row)"
+              @click="cambiarEstado({ registro: row, url: `${url}/${row.id}` })"
             />
           </q-td>
-          <q-td>{{ props.row.nombre }}</q-td>
-          <q-td>{{ props.row.ruta }}</q-td>
-          <q-td>{{ props.row.icono }}</q-td>
+          <q-td>{{ row.nombre }}</q-td>
+          <q-td>{{ row.ruta }}</q-td>
           <q-td>
-            <q-chip
-              v-if="props.row.estado === 'ACTIVO'"
-              square
-              color="info"
-              text-color="white"
-              label="ACTIVO"
+            <q-icon
+              size="md"
+              :name="row.icono"
             />
-            <q-chip
-              v-if="props.row.estado === 'INACTIVO'"
-              square
-              color="warning"
-              text-color="white"
-              label="INACTIVO"
-            />
+          </q-td>
+          <q-td>{{ row.orden }}</q-td>
+          <q-td>
+            <q-icon
+              size="xs"
+              :name="row.menuSuperior?.icono"
+            /> {{ row.menuSuperior?.nombre }}
+          </q-td>
+          <q-td>
+            <Estado :estado="row.estado" />
           </q-td>
         </q-tr>
       </template>
@@ -146,8 +98,9 @@
 </template>
 
 <script>
-import { ref, inject, onMounted } from 'vue'
+import { ref, inject } from 'vue'
 import CrudTable from '@components/common/CrudTable'
+import Menu from 'components/Formularios/Menu'
 
 const filters = [
   {
@@ -156,16 +109,25 @@ const filters = [
     type: 'input'
   },
   {
-    label: 'Fecha',
-    field: 'fecha',
-    type: 'date'
+    label: 'Descripcion',
+    field: 'descripcion',
+    type: 'input'
   },
   {
-    label: 'Fecha2',
-    field: 'fecha2',
-    type: 'date'
+    label: 'Estado',
+    field: 'estado',
+    type: 'select',
+    options: [
+      {
+        label: 'ACTIVO',
+        value: 'ACTIVO'
+      },
+      {
+        label: 'INACTIVO',
+        value: 'INACTIVO'
+      }
+    ]
   }
-
 ]
 
 const columns = [
@@ -177,7 +139,7 @@ const columns = [
   {
     name: 'activo',
     label: 'Activo',
-    sortable: false
+    sortable: true
   },
   {
     name: 'nombre',
@@ -192,44 +154,47 @@ const columns = [
   {
     name: 'icono',
     label: 'Icono',
+    sortable: false
+  },
+  {
+    name: 'orden',
+    label: 'Orden',
     sortable: true
+  },
+  {
+    name: 'menuSuperior',
+    label: 'Menu superior',
+    sortable: false
   },
   {
     name: 'estado',
     label: 'Estado',
-    sortable: true
+    sortable: false
   }
 ]
 
-const url = '/system/menus'
-
 export default {
-  components: { CrudTable },
+  components: { CrudTable, Menu },
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
-    const menus = ref([])
-    onMounted(async () => {
-      const { rows } = await _http.get('/system/menus')
-      menus.value = rows
-    })
+    const _message = inject('message')
 
+    const url = ref('system/menus')
     const menu = ref({
-      id: null,
-      nombre: '',
-      ruta: '',
-      icono: '',
-      orden: 0,
+      grupo: null,
+      nombre: null,
+      descripcion: null,
+      codigo: null,
       estado: 'ACTIVO'
     })
 
     const resetForm = () => {
       menu.value = {
-        id: null,
-        nombre: '',
-        ruta: '',
-        icono: '',
-        orden: 0,
+        grupo: null,
+        nombre: null,
+        descripcion: null,
+        codigo: null,
         estado: 'ACTIVO'
       }
     }
@@ -237,7 +202,7 @@ export default {
     const openModal = async (open, id) => {
       resetForm()
       if (id) {
-        menu.value = await _http.get(`${url}/${id}`)
+        menu.value = await _http.get(`/${url.value}/${id}`)
       }
       open()
     }
@@ -247,35 +212,27 @@ export default {
       close()
     }
 
-    const guardar = (props) => {
+    const guardar = async (update, close) => {
+      let mennsaje = 'Menu creado de manera exitosa.'
       if (menu.value.id) {
-        _http.put(`${url}/${menu.value.id}`, menu.value)
+        mennsaje = 'Menu actualizado de manera exitosa.'
+        await _http.put(`/${url.value}/${menu.value.id}`, menu.value)
       } else {
-        _http.post(url, menu.value)
+        await _http.post(`/${url.value}`, menu.value)
       }
-      props.update()
-      closeModal(props.close)
-    }
-
-    const eliminar = async (props, id) => {
-      await props.eliminar({ url: `${url}/${id}` })
-    }
-
-    const cambiarEstado = async (props, row) => {
-      await props.cambiarEstado({ registro: row, url: `${url}/${row.id}` })
+      _message.success(mennsaje)
+      await update()
+      closeModal(close)
     }
 
     return {
-      menus,
-      closeModal,
-      openModal,
-      guardar,
-      eliminar,
-      cambiarEstado,
-      url,
       menu,
       filters,
-      columns
+      columns,
+      url,
+      closeModal,
+      openModal,
+      guardar
     }
   }
 }

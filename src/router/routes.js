@@ -53,7 +53,8 @@ const routes = [
       { path: 'entidades', name: 'entidades', component: () => import('pages/Entidades.vue') },
       { path: 'menus', name: 'menus', component: () => import('pages/Menus.vue') },
       { path: 'roles', name: 'roles', component: () => import('pages/Roles.vue') },
-      { path: 'usuarios', name: 'usuarios', component: () => import('pages/Usuarios.vue') }
+      { path: 'usuarios', name: 'usuarios', component: () => import('pages/Usuarios.vue') },
+      { path: 'parametros', name: 'parametros', component: () => import('pages/Parametros.vue') }
     ]
   },
   {

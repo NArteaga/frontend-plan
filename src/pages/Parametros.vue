@@ -1,8 +1,8 @@
 <template>
   <q-page>
     <Titulo
-      titulo="Roles"
-      icono="group"
+      titulo="Parametros"
+      icono="settings"
     ></Titulo>
     <CrudTable
       :filters="filters"
@@ -15,18 +15,18 @@
           icon="add"
           color="secondary"
           @click="openModal(open)"
-          label="Nuevo rol"
+          label="Nuevo parametro"
         />
       </template>
-      <template v-slot:form="{ close, update }">
-        <q-card style="width: 900px; max-width: 90vw;">
+      <template v-slot:form="{ close, update}">
+        <q-card style="width: 700px; max-width: 90vw;">
           <q-toolbar class="q-pa-md">
             <q-icon
-              name="group"
+              name="settings"
               size="md"
             />
             <q-toolbar-title>
-              {{ rol.id ? 'Editar' : 'Agregar' }} rol
+              {{ entidad.id ? 'Editar' : 'Agregar' }} parametro
             </q-toolbar-title>
             <q-space />
             <q-btn
@@ -37,11 +37,11 @@
             />
           </q-toolbar>
           <q-card-section>
-            <Rol
-              v-model:valores="rol"
+            <Parametro
+              v-model:valores="entidad"
               @guardar="guardar(update, close)"
               @cancelar="closeModal(close)"
-            ></Rol>
+            ></Parametro>
           </q-card-section>
         </q-card>
       </template>
@@ -74,14 +74,9 @@
             />
           </q-td>
           <q-td>{{ row.nombre }}</q-td>
+          <q-td>{{ row.grupo }}</q-td>
           <q-td>{{ row.descripcion }}</q-td>
-          <q-td>{{ row.entidad?.nombre }}</q-td>
-          <q-td>
-            <li
-              v-for="(item, index) of row.menus"
-              :key="index"
-            >{{ item.nombre }}</li>
-          </q-td>
+          <q-td>{{ row.codigo }}</q-td>
           <q-td>
             <Estado :estado="row.estado" />
           </q-td>
@@ -94,12 +89,17 @@
 <script>
 import { ref, inject } from 'vue'
 import CrudTable from '@components/common/CrudTable'
-import Rol from 'components/Formularios/Rol'
+import Parametro from 'components/Formularios/Parametro'
 
 const filters = [
   {
     label: 'Nombre',
     field: 'nombre',
+    type: 'input'
+  },
+  {
+    label: 'Grupo',
+    field: 'grupo',
     type: 'input'
   },
   {
@@ -112,8 +112,14 @@ const filters = [
     field: 'estado',
     type: 'select',
     options: [
-      { label: 'ACTIVO', value: 'ACTIVO' },
-      { label: 'INACTIVO', value: 'INACTIVO' }
+      {
+        label: 'ACTIVO',
+        value: 'ACTIVO'
+      },
+      {
+        label: 'INACTIVO',
+        value: 'INACTIVO'
+      }
     ]
   }
 ]
@@ -127,27 +133,27 @@ const columns = [
   {
     name: 'activo',
     label: 'Activo',
-    sortable: false
+    sortable: true
   },
   {
     name: 'nombre',
     label: 'Nombre',
-    sortable: false
+    sortable: true
+  },
+  {
+    name: 'grupo',
+    label: 'Grupo',
+    sortable: true
   },
   {
     name: 'descripcion',
     label: 'Descripcion',
-    sortable: false
+    sortable: true
   },
   {
-    name: 'entidad',
-    label: 'Entidad',
-    sortable: false
-  },
-  {
-    name: 'menus',
-    label: 'Menus',
-    sortable: false
+    name: 'codigo',
+    label: 'Codigo',
+    sortable: true
   },
   {
     name: 'estado',
@@ -157,34 +163,33 @@ const columns = [
 ]
 
 export default {
-  components: { CrudTable, Rol },
+  components: { CrudTable, Parametro },
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
-    const url = ref('system/roles')
-    const rol = ref({
+    const url = ref('system/parametros')
+    const entidad = ref({
+      grupo: null,
       nombre: null,
       descripcion: null,
-      idEntidad: null,
-      permisos: [],
-      menus: []
+      codigo: null,
+      estado: 'ACTIVO'
     })
 
     const resetForm = () => {
-      rol.value = {
+      entidad.value = {
+        grupo: null,
         nombre: null,
         descripcion: null,
-        idEntidad: null,
-        permisos: [],
-        menus: []
+        codigo: null,
+        estado: 'ACTIVO'
       }
     }
 
     const openModal = async (open, id) => {
       resetForm()
       if (id) {
-        rol.value = await _http.get(`/${url.value}/${id}`)
-        rol.value.menus = rol.value.menus.map(x => x.id)
+        entidad.value = await _http.get(`/${url.value}/${id}`)
       }
       open()
     }
@@ -195,10 +200,10 @@ export default {
     }
 
     const guardar = (update, close) => {
-      if (rol.value.id) {
-        _http.put(`/${url.value}/${rol.value.id}`, rol.value)
+      if (entidad.value.id) {
+        _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
       } else {
-        _http.post(`/${url.value}`, rol.value)
+        _http.post(`/${url.value}`, entidad.value)
       }
       update()
       closeModal(close)
@@ -209,7 +214,7 @@ export default {
     }
 
     return {
-      rol,
+      entidad,
       filters,
       columns,
       url,

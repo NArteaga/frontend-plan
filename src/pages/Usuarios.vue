@@ -1,96 +1,59 @@
 <template>
   <q-page>
     <Titulo
-      titulo="Holas"
-      icono="home"
+      titulo="Usuarios"
+      icono="person"
     ></Titulo>
     <CrudTable
       :filters="filters"
       :columns="columns"
-      :url="'/system/usuarios'"
+      :url="url"
       :order="'createdAt'"
     >
-      <template v-slot:buttons="props">
+      <template v-slot:buttons="{ open }">
         <q-btn
           icon="add"
           color="secondary"
-          @click="openModal(props.open)"
-        > Agregar
-        </q-btn>
+          @click="openModal(open)"
+          label="Nuevo usuario"
+        />
       </template>
-      <template v-slot:form="props">
-        <q-card style="width: 700px; max-width: 90vw;">
+      <template v-slot:form="{ close, update}">
+        <q-card style="width: 800px; max-width: 90vw;">
           <q-toolbar class="q-pa-md">
             <q-icon
-              name="home_work"
+              name="person"
               size="md"
             />
             <q-toolbar-title>
-              {{ usuario.id ? 'Editar' : 'Agregar' }} usuario
+              {{ entidad.id ? 'Editar' : 'Agregar' }} usuario
             </q-toolbar-title>
             <q-space />
             <q-btn
               flat
               round
               icon="close"
-              @click="closeModal(props.close)"
+              @click="closeModal(close)"
             />
           </q-toolbar>
           <q-card-section>
-            <q-form
-              class="row q-col-gutter-md"
-              @submit="guardar(props)"
-            >
-              <q-input
-                class="col-xs-12 col-md-6"
-                label="Nombre"
-                filled
-                v-model="usuario.nombres"
-              ></q-input>
-              <q-input
-                class="col-xs-12 col-md-6"
-                label="Primer Apellido"
-                filled
-                v-model="usuario.primerApellido"
-              ></q-input>
-              <q-input
-                class="col-xs-12 col-md-6"
-                label="Segudo Apellido"
-                filled
-                v-model="usuario.segundoApellido"
-              ></q-input>
-              <div class="col-xs-12 text-right">
-                <q-btn
-                  label="Cancelar"
-                  @click="closeModal(props.close)"
-                />
-                <q-btn
-                  label="Guardar"
-                  type="submit"
-                  color="primary"
-                  class="q-ml-sm"
-                />
-              </div>
-            </q-form>
+            <Usuario
+              v-model:valores="entidad"
+              @guardar="guardar(update, close)"
+              @cancelar="closeModal(close)"
+            ></Usuario>
           </q-card-section>
         </q-card>
       </template>
-      <template v-slot:row="props">
+      <template v-slot:row="{ row, open, eliminar, cambiarEstado }">
         <q-tr>
           <q-td>
             <q-btn
               class="q-pa-xs"
               flat
               round
-              icon="fact_check"
-              @click="openModalComponentes(props.row)"
-            />
-            <q-btn
-              class="q-pa-xs"
-              flat
-              round
               icon="edit"
-              @click="openModal(props.open, props.row.id)"
+              @click="openModal(open, row.id)"
             />
             <q-btn
               class="q-pa-xs"
@@ -98,37 +61,25 @@
               round
               color="negative"
               icon="delete"
-              @click="eliminar(props.update, props.row.id)"
+              @click="eliminar({ url: `${url}/${row.id}` })"
             />
           </q-td>
           <q-td>
             <q-toggle
-              v-model="props.row.estado"
+              v-model="row.estado"
               color="primary"
               false-value="INACTIVO"
               true-value="ACTIVO"
-              @click="cambiarEstado(props.update, props.row)"
+              @click="cambiarEstado({ registro: row, url: `${url}/${row.id}` })"
             />
           </q-td>
-          <q-td>{{ getNombreCompleto(props.row) }}</q-td>
-          <q-td>{{ props.row.numeroDocumento }}</q-td>
-          <q-td>{{ props.row.correoElectronico }}</q-td>
-          <q-td>{{ props.row.cargo }}</q-td>
+          <q-td>{{ row.usuario }}</q-td>
+          <q-td>{{ row.numeroDocumento }}</q-td>
+          <q-td>{{ row.nombres }} {{ row.primerApellido }} {{ row.segundoApellido }}</q-td>
+          <q-td>{{ row.entidad? row.entidad.sigla:''}}</q-td>
+          <q-td>{{ row.cargo}}</q-td>
           <q-td>
-            <q-chip
-              v-if="props.row.estado === 'ACTIVO'"
-              square
-              color="info"
-              text-color="white"
-              label="ACTIVO"
-            />
-            <q-chip
-              v-if="props.row.estado === 'INACTIVO'"
-              square
-              color="warning"
-              text-color="white"
-              label="INACTIVO"
-            />
+            <Estado :estado="row.estado" />
           </q-td>
         </q-tr>
       </template>
@@ -139,6 +90,7 @@
 <script>
 import { ref, inject } from 'vue'
 import CrudTable from '@components/common/CrudTable'
+import Usuario from 'components/Formularios/Usuario'
 
 const filters = [
   {
@@ -147,16 +99,30 @@ const filters = [
     type: 'input'
   },
   {
-    label: 'Fecha',
-    field: 'fecha',
-    type: 'date'
+    label: 'Grupo',
+    field: 'grupo',
+    type: 'input'
   },
   {
-    label: 'Fecha2',
-    field: 'fecha2',
-    type: 'date'
+    label: 'Descripcion',
+    field: 'descripcion',
+    type: 'input'
+  },
+  {
+    label: 'Estado',
+    field: 'estado',
+    type: 'select',
+    options: [
+      {
+        label: 'ACTIVO',
+        value: 'ACTIVO'
+      },
+      {
+        label: 'INACTIVO',
+        value: 'INACTIVO'
+      }
+    ]
   }
-
 ]
 
 const columns = [
@@ -168,27 +134,27 @@ const columns = [
   {
     name: 'activo',
     label: 'Activo',
-    sortable: false
+    sortable: true
   },
   {
-    name: 'nombreCompleto',
-    label: 'Nombre completo',
-    sortable: false
+    name: 'nombre',
+    label: 'Nombre',
+    sortable: true
   },
   {
-    name: 'numeroDocumento',
-    label: 'Numero de documento',
-    sortable: false
+    name: 'grupo',
+    label: 'Grupo',
+    sortable: true
   },
   {
-    name: 'correoElectronico',
-    label: 'Correo electronico',
-    sortable: false
+    name: 'descripcion',
+    label: 'Descripcion',
+    sortable: true
   },
   {
-    name: 'cargo',
-    label: 'Cargo',
-    sortable: false
+    name: 'codigo',
+    label: 'Codigo',
+    sortable: true
   },
   {
     name: 'estado',
@@ -198,31 +164,33 @@ const columns = [
 ]
 
 export default {
-  components: { CrudTable },
+  components: { CrudTable, Usuario },
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
-
-    const usuario = ref({
-      id: null,
-      nombres: '',
-      primerApellido: '',
-      segundoApellido: ''
+    const url = ref('system/usuarios')
+    const entidad = ref({
+      grupo: null,
+      nombre: null,
+      descripcion: null,
+      codigo: null,
+      estado: 'ACTIVO'
     })
 
     const resetForm = () => {
-      usuario.value = {
-        id: null,
-        nombres: '',
-        primerApellido: '',
-        segundoApellido: ''
+      entidad.value = {
+        grupo: null,
+        nombre: null,
+        descripcion: null,
+        codigo: null,
+        estado: 'ACTIVO'
       }
     }
 
     const openModal = async (open, id) => {
       resetForm()
       if (id) {
-        usuario.value = await _http.get(`/system/usuarios/${id}`)
+        entidad.value = await _http.get(`/${url.value}/${id}`)
       }
       open()
     }
@@ -232,14 +200,14 @@ export default {
       close()
     }
 
-    const guardar = (props) => {
-      if (usuario.value.id) {
-        _http.put(`/system/usuarios/${usuario.value.id}`, usuario.value)
+    const guardar = (update, close) => {
+      if (entidad.value.id) {
+        _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
       } else {
-        _http.post('/system/usuarios', usuario.value)
+        _http.post(`/${url.value}`, entidad.value)
       }
-      props.update()
-      closeModal(props.close)
+      update()
+      closeModal(close)
     }
 
     const getNombreCompleto = (usuario) => {
@@ -247,13 +215,14 @@ export default {
     }
 
     return {
+      entidad,
+      filters,
+      columns,
+      url,
       closeModal,
       openModal,
       getNombreCompleto,
-      guardar,
-      usuario,
-      filters,
-      columns
+      guardar
     }
   }
 }

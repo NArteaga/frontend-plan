@@ -29,7 +29,6 @@
             <q-icon
               center
               :name="enableSearch ? 'close' : 'search'"
-              color="secondary"
             />
             <q-tooltip>{{ enableSearch ? 'Cerrar filtros' : 'Abrir filtros' }}</q-tooltip>
           </q-btn>
@@ -37,7 +36,6 @@
             <q-icon
               center
               name="refresh"
-              color="secondary"
             />
             <q-tooltip>Actualizar página</q-tooltip>
           </q-btn>
@@ -149,6 +147,7 @@
               :selected="props.selected"
               :open="openModal"
               :update="updateList"
+              :cambiarEstado="cambiarEstado"
               name="item"
             />
           </template>

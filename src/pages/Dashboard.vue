@@ -202,9 +202,11 @@ export default {
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
-
+    const dialogUsuario = ref(false)
     const usuario = ref({
       id: null,
+      usuario: '',
+      contrasena: '',
       nombres: '',
       primerApellido: '',
       segundoApellido: ''
@@ -247,6 +249,7 @@ export default {
     }
 
     return {
+      dialogUsuario,
       closeModal,
       openModal,
       getNombreCompleto,

@@ -10,8 +10,9 @@
           dense
           flat
           round
+          class="text-white"
           icon="menu"
-          :color="!$q.dark.isActive ? 'black' : ''"
+          color="white"
           @click="toggleLeftDrawer"
         />
         <q-space />
@@ -155,13 +156,17 @@
           <q-item
             v-for="item in menu"
             :key="item.ruta"
-            :active="($route.path.includes(item.ruta) && item.ruta !== '') || (item.ruta === '' && $route.path === '/')"
+            :active="esSeleccionado(item)"
             clickable
             v-ripple
+            active-class="bg-primary text-white"
             @click="$router.push(`/app/${item.ruta}`)"
           >
             <q-item-section avatar>
-              <q-icon :name="item.icono" />
+              <q-icon
+                :name="item.icono"
+                :color="esSeleccionado(item) ? 'white' : 'grey'"
+              />
             </q-item-section>
             <q-item-section>
               {{ item.nombre }}
@@ -195,6 +200,7 @@
 import { defineComponent, ref, computed, onMounted, inject } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -209,6 +215,7 @@ export default defineComponent({
     const darkMode = ref($q.dark.isActive)
     const leftDrawerOpen = ref(false)
     const store = useStore()
+    const route = useRoute()
 
     const logout = async () => {
       await _auth.logout()
@@ -225,6 +232,9 @@ export default defineComponent({
       leftDrawerOpen,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
+      },
+      esSeleccionado (item) {
+        return (route.path.includes(item.ruta) && item.ruta !== '') || (item.ruta === '' && route.path === '/')
       }
     }
   }

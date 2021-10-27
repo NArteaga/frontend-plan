@@ -2,166 +2,130 @@
   <q-form
     ref="usuario"
     @submit="$emit('guardar')"
+    class="row q-col-gutter-md"
   >
-    <div class="row q-col-gutter-md">
-      <div class="col-xs-12 text-subtitle1 text-secondary text-weight-bold">
-        Datos personales
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <q-input
-          filled
-          class="required"
-          :dense="dense"
-          label="Cedula de identidad"
-          v-model="valoresModel.numeroDocumento"
-          :rules="valoresRules.numeroDocumento"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <q-input
-          filled
-          :dense="dense"
-          label="Nombres"
-          class="required"
-          v-model="valoresModel.nombres"
-          :rules="valoresRules.numeroDocumento"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <q-input
-          filled
-          :dense="dense"
-          label="Primer apellido"
-          class="required"
-          v-model="valoresModel.primerApellido"
-          :rules="valoresRules.numeroDocumento"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <q-input
-          filled
-          :dense="dense"
-          label="Segundo apellido"
-          v-model="valoresModel.segundoApellido"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <q-input
-          filled
-          :dense="dense"
-          label="Telefono"
-          v-model="valoresModel.telefono"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <q-input
-          filled
-          :dense="dense"
-          label="Celular"
-          v-model="valoresModel.celular"
-          :rules="valoresRules.celular"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 text-subtitle1 text-secondary text-weight-bold">
-        Datos de usuario
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <q-select
-          ref="entidad"
-          filled
-          :dense="dense"
-          v-model="valoresModel.idEntidad"
-          :options="entidades"
-          label="Entidad"
-          option-value="id"
-          option-label="nombre"
-          emit-value
-          map-options
-          :rules="valoresRules.id_rol"
-          class="required"
-          @input="getRoles($event,true)"
-        />
-      </div>
-      <div class="col-xs-12 col-md-8">
-        <q-input
-          filled
-          :dense="dense"
-          label="Cargo"
-          v-model="valoresModel.cargo"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <q-select
-          v-model="valoresModel.roles"
-          filled
-          :dense="dense"
-          :options="roles"
-          label="Rol"
-          option-value="id"
-          option-label="nombre"
-          use-chips
-          emit-value
-          map-options
-          multiple
-          :rules="valoresRules.id_rol"
-          class="required"
-        />
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <q-input
-          filled
-          :dense="dense"
-          label="Correo electronico"
-          class="required"
-          v-model="valoresModel.correoElectronico"
-          :rules="valoresRules.correoElectronico"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <q-input
-          filled
-          :dense="dense"
-          label="Nombre Usuario"
-          v-model="valoresModel.usuario"
-          class="required"
-          :rules="valoresRules.usuario"
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <q-input
-          filled
-          :dense="dense"
-          label="Contraseña"
-          class="required"
-          v-model="valoresModel.contrasena"
-          :rules="disableContrasena ? null : valoresRules.contrasena  "
-        ></q-input>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <q-input
-          filled
-          :dense="dense"
-          :disable="disableContrasena"
-          :readonly="disableContrasena"
-          label="Confirmacion de contraseña"
-          v-model="valoresModel.confirmarContrasena"
-          :rules="disableContrasena ? null : valoresRules.contrasena"
-        ></q-input>
-      </div>
-
-      <div class="col-xs-12 text-right q-gutter-sm">
-        <q-btn
-          icon="close"
-          label="Cancelar"
-          @click="$emit('cancelar')"
-        />
-        <q-btn
-          icon="check"
-          color="primary"
-          label="Guardar"
-          type="submit"
-        />
-      </div>
+    <div class="col-xs-12 text-subtitle1 text-secondary text-weight-bold">
+      Datos personales
+    </div>
+    <q-input
+      filled
+      class="col-xs-12 col-md-4"
+      label="Cedula de identidad"
+      v-model="valoresModel.numeroDocumento"
+      :rules="valoresRules.numeroDocumento"
+    ></q-input>
+    <q-input
+      filled
+      label="Nombres"
+      class="col-xs-12 col-md-4"
+      v-model="valoresModel.nombres"
+      :rules="valoresRules.numeroDocumento"
+    ></q-input>
+    <q-input
+      filled
+      label="Primer apellido"
+      class="col-xs-12 col-md-4"
+      v-model="valoresModel.primerApellido"
+      :rules="valoresRules.numeroDocumento"
+    ></q-input>
+    <q-input
+      class="col-xs-12 col-md-4"
+      filled
+      label="Segundo apellido"
+      v-model="valoresModel.segundoApellido"
+    ></q-input>
+    <q-input
+      filled
+      class="col-xs-12 col-md-4"
+      label="Telefono"
+      v-model="valoresModel.telefono"
+    ></q-input>
+    <q-input
+      filled
+      class="col-xs-12 col-md-4"
+      label="Celular"
+      v-model="valoresModel.celular"
+      :rules="valoresRules.celular"
+    ></q-input>
+    <div class="col-xs-12 text-subtitle1 text-secondary text-weight-bold">
+      Datos de usuario
+    </div>
+    <q-select
+      ref="entidad"
+      filled
+      class="col-xs-12 col-md-6"
+      v-model="valoresModel.idEntidad"
+      :options="entidades"
+      label="Entidad"
+      option-value="id"
+      option-label="nombre"
+      emit-value
+      map-options
+      :rules="valoresRules.id_rol"
+      @input="getRoles($event,true)"
+    />
+    <q-input
+      filled
+      class="col-xs-12 col-md-6"
+      label="Cargo"
+      v-model="valoresModel.cargo"
+    ></q-input>
+    <q-select
+      v-model="valoresModel.roles"
+      filled
+      class="col-xs-12 col-md-6"
+      :options="roles"
+      label="Rol"
+      option-value="id"
+      option-label="nombre"
+      use-chips
+      emit-value
+      map-options
+      multiple
+      :rules="valoresRules.id_rol"
+    />
+    <q-input
+      filled
+      class="col-xs-12 col-md-6"
+      label="Correo electronico"
+      v-model="valoresModel.correoElectronico"
+      :rules="valoresRules.correoElectronico"
+    ></q-input>
+    <q-input
+      filled
+      label="Nombre Usuario"
+      v-model="valoresModel.usuario"
+      class="col-xs-12 col-md-6"
+      :rules="valoresRules.usuario"
+    ></q-input>
+    <q-input
+      filled
+      v-if="!valoresModel.id"
+      label="Contraseña"
+      class="col-xs-12 col-md-6"
+      v-model="valoresModel.contrasena"
+      :rules="valoresRules.contrasena"
+    ></q-input>
+    <q-input
+      filled
+      v-if="!valoresModel.id"
+      class="col-xs-12 col-md-6"
+      label="Confirmacion de contraseña"
+      v-model="valoresModel.confirmarContrasena"
+      :rules="valoresRules.contrasena"
+    ></q-input>
+    <div class="col-xs-12 text-right q-gutter-sm">
+      <q-btn
+        icon="close"
+        label="Cancelar"
+        @click="$emit('cancelar')"
+      />
+      <q-btn
+        icon="check"
+        color="primary"
+        label="Guardar"
+        type="submit"
+      />
     </div>
   </q-form>
 </template>
@@ -197,9 +161,20 @@ export default {
     const roles = ref([])
 
     onMounted(async () => {
-      const { rows } = await _http.get('/system/entidades')
-      entidades.value = rows
+      entidades.value = await getEntidades()
+      roles.value = await getRoles()
+      valoresModel.value.roles = props.valores.roles.map(x => x.id)
     })
+
+    async function getEntidades () {
+      const { rows } = await _http.get('/system/entidades')
+      return rows
+    }
+
+    async function getRoles () {
+      const { rows } = await _http.get('/system/roles')
+      return rows
+    }
 
     return {
       valoresModel,

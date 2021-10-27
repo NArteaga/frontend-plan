@@ -179,7 +179,7 @@ export default {
       step.value--
     }
 
-    const siguiente = async (props) => {
+    const siguiente = async () => {
       if (step.value === 1) {
         const validacion = await formRol.value.validate()
         if (validacion) {

@@ -76,8 +76,9 @@
           <q-td>{{ row.usuario }}</q-td>
           <q-td>{{ row.numeroDocumento }}</q-td>
           <q-td>{{ row.nombres }} {{ row.primerApellido }} {{ row.segundoApellido }}</q-td>
-          <q-td>{{ row.entidad? row.entidad.sigla:''}}</q-td>
-          <q-td>{{ row.cargo}}</q-td>
+          <q-td>{{ row.entidad?.nombre }}</q-td>
+          <q-td>{{ row.cargo }}</q-td>
+          <q-td>{{ row.celular }}</q-td>
           <q-td>
             <Estado :estado="row.estado" />
           </q-td>
@@ -94,13 +95,18 @@ import Usuario from 'components/Formularios/Usuario'
 
 const filters = [
   {
-    label: 'Nombre',
-    field: 'nombre',
+    label: 'Usuario',
+    field: 'usuario',
     type: 'input'
   },
   {
-    label: 'Grupo',
-    field: 'grupo',
+    label: 'Nombres',
+    field: 'nombres',
+    type: 'input'
+  },
+  {
+    label: 'Primer Apellido',
+    field: 'primerApellido',
     type: 'input'
   },
   {
@@ -138,22 +144,32 @@ const columns = [
   },
   {
     name: 'nombre',
-    label: 'Nombre',
+    label: 'Nombre Usuario',
     sortable: true
   },
   {
-    name: 'grupo',
-    label: 'Grupo',
+    name: 'numeroDocumento',
+    label: 'Nombre Documento',
     sortable: true
   },
   {
-    name: 'descripcion',
-    label: 'Descripcion',
+    name: 'nombrePersona',
+    label: 'Nombre Persona',
     sortable: true
   },
   {
-    name: 'codigo',
-    label: 'Codigo',
+    name: 'entidad',
+    label: 'Entidad',
+    sortable: false
+  },
+  {
+    name: 'cargo',
+    label: 'Cargo',
+    sortable: true
+  },
+  {
+    name: 'celular',
+    label: 'Celular',
     sortable: true
   },
   {
@@ -170,19 +186,35 @@ export default {
     const _http = inject('http')
     const url = ref('system/usuarios')
     const entidad = ref({
-      grupo: null,
-      nombre: null,
-      descripcion: null,
-      codigo: null,
+      cargo: null,
+      celular: null,
+      correoElectronico: null,
+      foto: null,
+      idEntidad: null,
+      nombres: null,
+      numeroDocumento: null,
+      primerApellido: null,
+      roles: [],
+      segundoApellido: null,
+      telefono: null,
+      usuario: null,
       estado: 'ACTIVO'
     })
 
     const resetForm = () => {
       entidad.value = {
-        grupo: null,
-        nombre: null,
-        descripcion: null,
-        codigo: null,
+        cargo: null,
+        celular: null,
+        correoElectronico: null,
+        foto: null,
+        idEntidad: null,
+        nombres: null,
+        numeroDocumento: null,
+        primerApellido: null,
+        roles: [],
+        segundoApellido: null,
+        telefono: null,
+        usuario: null,
         estado: 'ACTIVO'
       }
     }
@@ -200,13 +232,13 @@ export default {
       close()
     }
 
-    const guardar = (update, close) => {
+    const guardar = async (update, close) => {
       if (entidad.value.id) {
-        _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
+        await _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
       } else {
-        _http.post(`/${url.value}`, entidad.value)
+        await _http.post(`/${url.value}`, entidad.value)
       }
-      update()
+      await update()
       closeModal(close)
     }
 

@@ -1,8 +1,8 @@
 {
-  "name": "frontend-base",
+  "name": "frontend-almacenes",
   "version": "0.0.1",
-  "description": "frontend-base",
-  "productName": "frontend-base",
+  "description": "frontend-almacenes",
+  "productName": "frontend-almacenes",
   "author": "Ivan Tancara Casilla <ivan.tancara.c@gmail.com>",
   "private": true,
   "scripts": {

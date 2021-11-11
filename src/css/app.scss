@@ -2,9 +2,19 @@
 @import './font';
 @import './theme';
 @import './editor';
+@font-face {
+  font-family: dosisFont;
+  src: url(./fonts/Dosis-VariableFont_wght.ttf);
+}
+
 
 body {
   font-family: "Poppins", "-apple-system", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+//Fonts
+.my-font {
+  font-family: 'dosisFont';
 }
 
 // Layout

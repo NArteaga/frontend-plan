@@ -126,14 +126,14 @@
             <q-icon
               name="dashboard"
               size="sm"
-            /> Almacenes
+            /> Frontend base
           </p>
           <div class="text-center q-pa-md">
             <q-avatar
               v-if="usuario?.nombres"
               size="64px"
               font-size="42px"
-              color="secondary"
+              color="info"
               text-color="white"
             >
               {{ usuario?.nombres[0]?.toUpperCase() }}
@@ -239,8 +239,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-$aside: #184650;
-$aside-dark: #21616d;
+$aside: #1e1e2d;
+$aside-dark: #1b1b28;
 $height: 190px;
 
 .q-drawer-container {

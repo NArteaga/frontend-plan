@@ -3,7 +3,7 @@
     class="col-xs-12"
     style="margin-bottom:-130px;"
   >
-    <div>
+    <div class="bg-primary text-white">
       <!-- <div class="text-secondary"> -->
       <q-toolbar
         class="q-gutter-md q-pl-lg"

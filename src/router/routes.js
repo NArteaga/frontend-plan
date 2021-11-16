@@ -54,8 +54,7 @@ const routes = [
       { path: 'menus', name: 'menus', component: () => import('pages/Menus.vue') },
       { path: 'roles', name: 'roles', component: () => import('pages/Roles.vue') },
       { path: 'usuarios', name: 'usuarios', component: () => import('pages/Usuarios.vue') },
-      { path: 'parametros', name: 'parametros', component: () => import('pages/Parametros.vue') },
-      { path: 'almacenes', name: 'almacenes', component: () => import('pages/Almacenes.vue') }
+      { path: 'parametros', name: 'parametros', component: () => import('pages/Parametros.vue') }
     ]
   },
   {

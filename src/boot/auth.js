@@ -1,16 +1,16 @@
 import { boot } from 'quasar/wrappers'
+import axios from 'axios'
 
 const AUTH_URL = process.env.AUTH_URL
 
 export default boot(({ app, router, store }) => {
-  const _axios = app.config.globalProperties.$axios
   const _storage = app.config.globalProperties.$storage
   const _store = store
   const _message = app.config.globalProperties.$message
 
   const login = async (params) => {
     try {
-      const { data } = await _axios.post(`${AUTH_URL}/login`, params)
+      const { data } = await axios.post(`${AUTH_URL}/login`, params)
       const respuesta = data.datos
       const usuario = {
         usuario: respuesta.usuario,
@@ -45,7 +45,7 @@ export default boot(({ app, router, store }) => {
   }
 
   const loginCiudadania = async () => {
-    const { data } = await _axios.get(`${process.env.BACKEND_URL}/codigo`)
+    const { data } = await axios.get(`${process.env.BACKEND_URL}/codigo`)
     if (data.codigo) {
       _storage.set('oauth2_state', data.codigo || null)
       window.location.href = data.url
@@ -67,7 +67,7 @@ export default boot(({ app, router, store }) => {
     const codigo = _storage.get('oauth2_state')
     const usuario = _storage.get('usuario')
     if (codigo && usuario) {
-      const { data } = await _axios.post(`${process.env.BACKEND_URL}/logout`, { usuario, codigo })
+      const { data } = await axios.post(`${process.env.BACKEND_URL}/logout`, { usuario, codigo })
       window.location.href = data.url
     }
   }
@@ -91,6 +91,15 @@ export default boot(({ app, router, store }) => {
     _store.commit('global/setRoles', _storage.get('roles'))
     _store.commit('global/setMenu', _storage.get('menu'))
     _store.commit('global/setPermisos', _storage.get('permisos'))
+  }
+
+  app.config.globalProperties.$auth = {
+    cleanStore,
+    initStore,
+    login,
+    loginCiudadania,
+    logout,
+    logoutCiudadania
   }
 
   app.provide('auth', {

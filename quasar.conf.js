@@ -26,8 +26,8 @@ module.exports = configure(function (ctx) {
     boot: [
       'storage',
       'message',
-      'http',
       'auth',
+      'http',
       'globalComponents'
     ],
 
@@ -89,7 +89,7 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: false,
-      port: 8000,
+      port: 8080,
       open: true // opens browser window automatically
     },
 

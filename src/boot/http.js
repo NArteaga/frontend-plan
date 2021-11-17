@@ -3,7 +3,7 @@ import { Loading } from 'quasar'
 import { boot } from 'quasar/wrappers'
 
 const urlBase = process.env.API_URL
-const codeErrorsLogout = [401]
+const codeErrorsLogout = [401, 403, 500]
 const messages = {
   'jwt expired': 'La sesión caducó, ingrese otra vez al sistema'
 }
@@ -12,7 +12,9 @@ export default boot(({ app, router, store }) => {
   const Storage = app.config.globalProperties.$storage
   const Message = app.config.globalProperties.$message
   const Auth = app.config.globalProperties.$auth
-
+  console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+  console.log(Auth)
+  console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
   const codeLogout = [401, 403, 500]
 
   axios.interceptors.response.use(async (response) => {
@@ -55,6 +57,9 @@ export default boot(({ app, router, store }) => {
             }
             Message.error(messages[error.response.data?.mensaje] || error.response.data?.mensaje || 'Ocurrio un error desconocido.')
             if (codeErrorsLogout.includes(error.response.status)) {
+              console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+              console.log(Auth.logout())
+              console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
               await Auth.logout()
             }
           } else {

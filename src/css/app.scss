@@ -10,7 +10,7 @@ body {
 // Layout
 .q-footer-main {
   background-color: transparent;
-  
+
   .footer {
     font-size: .9rem;
     color: $grey-9;
@@ -22,18 +22,22 @@ body.body--dark {
   .q-dark {
     color: #92929f;
   }
+
   .q-page {
     background-color: $dark-page;
   }
+
   .q-footer-main {
     .footer {
       color: $grey-1;
     }
   }
+
   .bg-info {
     background-color: #2f264f !important;
     color: #8950fc;
   }
+
   .bg-primary {
     color: #3699ff;
     background-color: #212e48 !important;

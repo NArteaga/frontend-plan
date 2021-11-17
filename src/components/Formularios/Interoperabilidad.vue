@@ -23,19 +23,31 @@
       >
         <q-input
           filled
-          class="col-xs-12 col-md-6"
+          class="col-xs-12 col-md-8"
           label="Nombre de la aplicacion"
           v-model="valoresModel.nombre"
           :rules="valoresRules.nombre"
-        >
-        </q-input>
+        />
         <q-input
           filled
-          class="col-xs-12 col-md-6"
+          class="col-xs-12 col-md-4"
+          label="Duracion del token"
+          v-model="valoresModel.caducidad"
+          :rules="valoresRules.caducidad"
+        >
+          <template v-slot:append>
+            Hrs.
+          </template>
+        </q-input>
+
+        <q-input
+          filled
+          type="textarea"
+          class="col-xs-12"
           label="Descripcion"
           v-model="valoresModel.descripcion"
           :rules="valoresRules.descripcion"
-        ></q-input>
+        />
         <q-select
           filled
           v-model="valoresModel.idEntidad"
@@ -149,9 +161,9 @@ export default {
     }
 
     async function getPermisos () {
-      let url = 'system/permisos'
+      let url = 'system/permisos?tipo=INTEROPERABILIDAD'
       if (props.valores.id) {
-        url = `system/roles/${props.valores.id}/permisos`
+        url = `system/aplicaciones/${props.valores.id}/permisos`
       }
       const rows = await _http.get(url)
       return rows.rows || rows

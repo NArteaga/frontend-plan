@@ -12,9 +12,6 @@ export default boot(({ app, router, store }) => {
   const Storage = app.config.globalProperties.$storage
   const Message = app.config.globalProperties.$message
   const Auth = app.config.globalProperties.$auth
-  console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-  console.log(Auth)
-  console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
   const codeLogout = [401, 403, 500]
 
   axios.interceptors.response.use(async (response) => {

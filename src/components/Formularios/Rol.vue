@@ -167,7 +167,7 @@ export default {
       return rows
     }
     async function getPermisos () {
-      let url = 'system/permisos'
+      let url = 'system/permisos?tipo=SISTEMA'
       if (props.valores.id) {
         url = `system/roles/${props.valores.id}/permisos`
       }

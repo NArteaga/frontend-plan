@@ -76,11 +76,16 @@
           <q-td>{{ row.nombre }}</q-td>
           <q-td>{{ row.descripcion }}</q-td>
           <q-td>{{ row.entidad?.nombre }}</q-td>
+          <q-td>{{ row.caducidad }} Hrs.</q-td>
           <q-td>
-            <li
-              v-for="(item, index) of row.menus"
-              :key="index"
-            >{{ item.nombre }}</li>
+            <q-input
+              style="min-width:600px;min-height:200px;overflow-x:hidden !important;"
+              :readonly="true"
+              type="textarea"
+              v-model="row.token"
+            >
+
+            </q-input>
           </q-td>
           <q-td>
             <Estado :estado="row.estado" />
@@ -145,8 +150,13 @@ const columns = [
     sortable: false
   },
   {
-    name: 'menus',
-    label: 'Menus',
+    name: 'caducidad',
+    label: 'Caducidad',
+    sortable: false
+  },
+  {
+    name: 'token',
+    label: 'Token',
     sortable: false
   },
   {
@@ -161,7 +171,7 @@ export default {
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
-    const url = ref('system/roles')
+    const url = ref('system/aplicaciones')
     const rol = ref({
       nombre: null,
       descripcion: null,
@@ -184,7 +194,6 @@ export default {
       resetForm()
       if (id) {
         rol.value = await _http.get(`/${url.value}/${id}`)
-        rol.value.menus = rol.value.menus.map(x => x.id)
       }
       open()
     }
@@ -194,13 +203,16 @@ export default {
       close()
     }
 
-    const guardar = (update, close) => {
+    const guardar = async (update, close) => {
       if (rol.value.id) {
         _http.put(`/${url.value}/${rol.value.id}`, rol.value)
       } else {
         _http.post(`/${url.value}`, rol.value)
       }
-      update()
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+      console.log('se guarda', update)
+      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
+      await update()
       closeModal(close)
     }
 
@@ -221,3 +233,8 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+td {
+  width: 50px;
+}
+</style>

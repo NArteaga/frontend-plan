@@ -55,6 +55,7 @@
           rows-per-page-label="Filas por pagina"
           v-model:selected="selected"
           @request="getData"
+          :wrap-cells="true"
         >
           <template
             v-slot:top
@@ -213,8 +214,8 @@ export default {
       updateList()
     })
 
-    const updateList = () => {
-      getData({
+    const updateList = async () => {
+      await getData({
         pagination: pagination.value,
         filter: undefined
       })

@@ -85,8 +85,8 @@
               v-model="row.token"
             />
           </q-td>
-          <q-td>{{ row.createdAt }}</q-td>
-          <q-td>{{ row.updatedAt }}</q-td>
+          <q-td class="text-center">{{ row.createdAt }}</q-td>
+          <q-td class="text-center">{{ row.updatedAt }}</q-td>
           <q-td>
             <Estado :estado="row.estado" />
           </q-td>

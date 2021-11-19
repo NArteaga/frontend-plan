@@ -76,17 +76,17 @@
           <q-td>{{ row.nombre }}</q-td>
           <q-td>{{ row.descripcion }}</q-td>
           <q-td>{{ row.entidad?.nombre }}</q-td>
-          <q-td>{{ row.caducidad }} Hrs.</q-td>
+          <q-td>{{ row.caducidad ? `${row.caducidad} Hrs.` : 'INFINITO' }} </q-td>
           <q-td>
             <q-input
-              style="min-width:600px;min-height:200px;overflow-x:hidden !important;"
+              style="min-width:400px;min-height:200px;overflow-x:hidden !important;"
               :readonly="true"
               type="textarea"
               v-model="row.token"
-            >
-
-            </q-input>
+            />
           </q-td>
+          <q-td>{{ row.createdAt }}</q-td>
+          <q-td>{{ row.updatedAt }}</q-td>
           <q-td>
             <Estado :estado="row.estado" />
           </q-td>
@@ -160,6 +160,16 @@ const columns = [
     sortable: false
   },
   {
+    name: 'createdAt',
+    label: 'Fecha de registro',
+    sortable: false
+  },
+  {
+    name: 'updatedAt',
+    label: 'Fecha de ultima actualizacion',
+    sortable: false
+  },
+  {
     name: 'estado',
     label: 'Estado',
     sortable: false
@@ -185,6 +195,7 @@ export default {
         nombre: null,
         descripcion: null,
         idEntidad: null,
+        regenerar: false,
         permisos: [],
         menus: []
       }
@@ -194,6 +205,7 @@ export default {
       resetForm()
       if (id) {
         rol.value = await _http.get(`/${url.value}/${id}`)
+        rol.value.regenerar = false
       }
       open()
     }
@@ -205,13 +217,10 @@ export default {
 
     const guardar = async (update, close) => {
       if (rol.value.id) {
-        _http.put(`/${url.value}/${rol.value.id}`, rol.value)
+        await _http.put(`/${url.value}/${rol.value.id}`, rol.value)
       } else {
-        _http.post(`/${url.value}`, rol.value)
+        await _http.post(`/${url.value}`, rol.value)
       }
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
-      console.log('se guarda', update)
-      console.log('==============================_MENSAJE_A_MOSTRARSE_==============================')
       await update()
       closeModal(close)
     }

@@ -60,6 +60,12 @@
           class="col-xs-12"
           :rules="valoresRules.idEntidad"
         />
+        <q-checkbox
+          v-if="valoresModel.id"
+          v-model="valoresModel.regenerar"
+          label="Volver a generar el token"
+        />
+
       </q-form>
     </q-step>
     <q-step

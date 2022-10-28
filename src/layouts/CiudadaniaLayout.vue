@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh lpR lff">
 
-    <q-header :class="{ 'bg-grey-4': ! $q.dark.isActive, 'q-dark': $q.dark.isActive }">
+    <q-header :class="{ 'bg-primary': ! $q.dark.isActive, 'q-dark': $q.dark.isActive }">
       <q-toolbar>
         <q-btn
           dense
@@ -12,9 +12,13 @@
           color="white"
           @click="toggleLeftDrawer"
         />
-        <img src="~assets/logo.png" style="height: 30px;"/>
         <q-space />
         <q-space />
+        <q-toggle
+          v-model="darkMode"
+          icon="dark_mode"
+          @click="darkModeChange"
+        />
         <q-item
           clickable
           v-ripple
@@ -108,46 +112,6 @@
           </q-menu>
         </q-item>
       </q-toolbar>
-      <q-drawer
-        show-if-above
-        v-model="drawer"
-        side="left"
-        bordered
-        :mini="leftDrawerOpen"
-        :breakpoint="700"
-        class="bg-white"
-        :width="250"
-      >
-        <div class="text-center">
-          <div :class="leftDrawerOpen ? 'q-pa-sm' : 'q-pa-md' ">
-            <img src="~assets/sidebar.png" style="width: 90%;"/>
-          </div>
-        </div>
-        <q-list
-          padding
-          v-if="menu.length"
-        >
-          <q-item
-            v-for="item in menu"
-            :key="item.ruta"
-            :active="esSeleccionado(item)"
-            clickable
-            v-ripple
-            active-class="bg-teal text-white"
-            @click="$router.push(`/app/${item.ruta}`)"
-          >
-            <q-item-section avatar>
-              <q-icon
-                :name="item.icono"
-                :color="esSeleccionado(item) ? 'white' : 'dark'"
-              />
-            </q-item-section>
-            <q-item-section :class="esSeleccionado(item) ? 'text-white':'text-dark'">
-              {{ item.nombre }}
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-drawer>
     </q-header>
 
     <q-page-container>
@@ -171,29 +135,29 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed, onMounted, inject } from 'vue'
+import { defineComponent, ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
+import usePlugins from '../common/usePlugins'
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 
 export default defineComponent({
   name: 'MainLayout',
   setup (props, context) {
-    const _auth = inject('auth')
+    const { Auth } = usePlugins()
 
     onMounted(() => {
-      _auth.initStore()
+      Auth.initStore()
     })
 
     const $q = useQuasar()
     const darkMode = ref($q.dark.isActive)
     const leftDrawerOpen = ref(false)
-    const drawer = ref(false)
     const store = useStore()
     const route = useRoute()
 
     const logout = async () => {
-      await _auth.logout()
+      await Auth.logout()
     }
 
     return {
@@ -205,9 +169,7 @@ export default defineComponent({
       menu: computed(() => store.state.global.menu),
       usuario: computed(() => store.state.global.usuario),
       leftDrawerOpen,
-      drawer,
       toggleLeftDrawer () {
-        if (!drawer.value) drawer.value = true
         leftDrawerOpen.value = !leftDrawerOpen.value
       },
       esSeleccionado (item) {

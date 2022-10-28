@@ -51,11 +51,27 @@ const routes = [
     children: [
       { path: 'dashboard', name: 'dashboard', component: () => import('pages/Dashboard.vue') },
       { path: 'entidades', name: 'entidades', component: () => import('pages/Entidades.vue') },
+      { path: 'entidades/:id', name: 'entidad-usuario', component: () => import('pages/Usuarios.vue') },
       { path: 'menus', name: 'menus', component: () => import('pages/Menus.vue') },
       { path: 'roles', name: 'roles', component: () => import('pages/Roles.vue') },
       { path: 'usuarios', name: 'usuarios', component: () => import('pages/Usuarios.vue') },
       { path: 'parametros', name: 'parametros', component: () => import('pages/Parametros.vue') },
-      { path: 'interoperabilidad', name: 'interoperabilidad', component: () => import('pages/Interoperabilidad.vue') }
+      { path: 'interoperabilidad', name: 'interoperabilidad', component: () => import('pages/Interoperabilidad.vue') },
+      { path: 'planificacion', name: 'planificacion', component: () => import('pages/Planificacion.vue') },
+      { path: 'entidades/plan/:id', name: 'formulacionPoa', component: () => import('components/Planificacion/Formulacion/Formulacion.vue') }
+    ]
+  },
+  {
+    path: '/ciudadania/',
+    component: () => import('layouts/CiudadaniaLayout.vue'),
+    children: [
+      { path: 'aprobar-documento', name: 'aprobar', component: () => import('pages/CiudadaniaDigital/Firma.vue') },
+      { path: 'documento-aprobado', name: 'aprobado', component: () => import('pages/CiudadaniaDigital/AprobacionDocumento.vue') },
+      {
+        path: 'login',
+        name: 'login-ciudadania',
+        component: () => import('src/pages/CiudadaniaDigital/Login')
+      }
     ]
   },
   {

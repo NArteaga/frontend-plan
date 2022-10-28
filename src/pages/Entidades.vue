@@ -8,6 +8,9 @@
       :filters="filters"
       :columns="columns"
       :url="url"
+      :grid="true"
+      :paginationPerPage="paginationPerPage"
+      :rowsPerPage="rowsPerPage"
       :order="'createdAt'"
     >
       <template v-slot:buttons="{ open }">
@@ -45,42 +48,53 @@
           </q-card-section>
         </q-card>
       </template>
-      <template v-slot:row="{ row, open, eliminar, cambiarEstado }">
-        <q-tr>
-          <q-td>
-            <q-btn
-              class="q-pa-xs"
-              flat
-              round
-              icon="edit"
-              @click="openModal(open, row.id)"
-            />
-            <q-btn
-              class="q-pa-xs"
-              flat
-              round
-              color="negative"
-              icon="delete"
-              @click="eliminar({ url: `${url}/${row.id}` })"
-            />
-          </q-td>
-          <q-td>
-            <q-toggle
-              v-model="row.estado"
-              color="primary"
-              false-value="INACTIVO"
-              true-value="ACTIVO"
-              @click="cambiarEstado({ registro: row, url: `${url}/${row.id}` })"
-            />
-          </q-td>
-          <q-td>{{ row.nombre }}</q-td>
-          <q-td>{{ row.sigla }}</q-td>
-          <q-td>{{ row.email }}</q-td>
-          <q-td>{{ row.telefono }}</q-td>
-          <q-td>
-            <Estado :estado="row.estado" />
-          </q-td>
-        </q-tr>
+      <template v-slot:item="{ row, open, cambiarEstado }">
+        <div class="q-pa-xs col-xs-12 col-sm-4 col-md-3">
+          <q-card class="my-card">
+            <q-img :class="row.estado === 'ACTIVO'? '' : 'gray'" src="~assets/logo-mjti.png">
+              <div class="absolute-bottom bg-white text-black text-subtitle2 text-center">
+                <q-btn
+                  round
+                  :color="row.estado === 'ACTIVO'? 'primary': 'red-7'"
+                  :icon="row.estado === 'ACTIVO'? 'check' : 'close'"
+                  class="absolute"
+                  @click="cambiarEstado(cambioEstado(row))"
+                  style="top: 0; right: 12px; transform: translateY(-50%);"
+                >
+                  <q-tooltip class="bg-indigo" :offset="[10, 10]">
+                    Activar o Inactivar la Institución
+                  </q-tooltip>
+                </q-btn>
+                {{ row.nombre }}
+              </div>
+            </q-img>
+            <q-card-section>
+              <div class="row">
+                <div class="col-xs-4 text-center">
+                  <q-btn flat round color="primary" size="lg" icon="badge" @click="$router.push(`entidades/${row.id}`)">
+                    <q-tooltip class="bg-indigo" :offset="[10, 10]">
+                      Lista del Personal
+                    </q-tooltip>
+                  </q-btn>
+                </div>
+                <div class="col-xs-4 text-center">
+                  <q-btn flat round color="primary" size="lg" icon="edit_note" @click="openModal(open, row.id)">
+                    <q-tooltip class="bg-indigo" :offset="[10, 10]">
+                      Editar datos de la Institución
+                    </q-tooltip>
+                  </q-btn>
+                </div>
+                <div class="col-xs-4 text-center">
+                  <q-btn flat round color="primary" size="lg" icon="book" @click="$router.push(`entidades/plan/${row.id}`)">
+                    <q-tooltip class="bg-indigo" :offset="[10, 10]">
+                      Ver Planificación
+                    </q-tooltip>
+                  </q-btn>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
       </template>
     </CrudTable>
   </q-page>
@@ -98,8 +112,8 @@ const filters = [
     type: 'input'
   },
   {
-    label: 'Sigla',
-    field: 'sigla',
+    label: 'Departamento',
+    field: 'departamento',
     type: 'input'
   },
   {
@@ -126,11 +140,6 @@ const columns = [
     sortable: false
   },
   {
-    name: 'sigla',
-    label: 'Sigla',
-    sortable: false
-  },
-  {
     name: 'email',
     label: 'Correo electronico',
     sortable: false
@@ -154,28 +163,37 @@ export default {
     const _http = inject('http')
     const url = ref('system/entidades')
     const entidad = ref({
-      descripcion: null,
-      direccion: null,
-      email: null,
-      idEntidad: null,
-      nivel: null,
       nombre: null,
-      sigla: null,
+      departamento: null,
+      provincia: null,
+      municipio: null,
+      direccion: null,
+      horario: null,
+      servicio: [],
+      email: null,
       telefono: null,
-      web: null
+      lenguas: [],
+      latitud: null,
+      longitud: null,
+      estado: 'ACTIVO'
     })
-
+    const paginationPerPage = ref([16, 32, 64])
+    const rowsPerPage = ref(8)
     const resetForm = () => {
       entidad.value = {
-        descripcion: null,
-        direccion: null,
-        email: null,
-        idEntidad: null,
-        nivel: null,
         nombre: null,
-        sigla: null,
+        departamento: null,
+        provincia: null,
+        municipio: null,
+        direccion: null,
+        horario: null,
+        servicio: [],
+        email: null,
         telefono: null,
-        web: null
+        lenguas: [],
+        latitud: null,
+        longitud: null,
+        estado: 'ACTIVO'
       }
     }
 
@@ -193,6 +211,9 @@ export default {
     }
 
     const guardar = async (update, close) => {
+      entidad.value.departamento = entidad.value.departamento.nombre
+      entidad.value.provincia = entidad.value.provincia.nombre
+      entidad.value.municipio = entidad.value.municipio.nombre
       if (entidad.value.id) {
         await _http.put(`/${url.value}/${entidad.value.id}`, entidad.value)
       } else {
@@ -200,6 +221,12 @@ export default {
       }
       await update()
       closeModal(close)
+    }
+
+    const cambioEstado = (row) => {
+      if (row.estado === 'ACTIVO') row.estado = 'INACTIVO'
+      else row.estado = 'ACTIVO'
+      return { registro: row, url: `${url.value}/${row.id}` }
     }
 
     const getNombreCompleto = (usuario) => {
@@ -211,11 +238,19 @@ export default {
       filters,
       columns,
       url,
+      cambioEstado,
       closeModal,
       openModal,
+      paginationPerPage,
+      rowsPerPage,
       getNombreCompleto,
       guardar
     }
   }
 }
 </script>
+<style>
+  .gray img{
+    filter: grayscale(1)
+  }
+</style>

@@ -9,6 +9,7 @@
       :columns="columns"
       :url="url"
       :order="'createdAt'"
+      :query="addQuery"
     >
       <template v-slot:buttons="{ open }">
         <q-btn
@@ -59,6 +60,20 @@
               class="q-pa-xs"
               flat
               round
+              icon="file_upload"
+              @click="openDocumento(row.id)"
+            />
+            <q-btn
+              class="q-pa-xs"
+              flat
+              round
+              icon="description"
+              @click="goDocumento(row.documento)"
+            />
+            <q-btn
+              class="q-pa-xs"
+              flat
+              round
               color="negative"
               icon="delete"
               @click="eliminar({ url: `${url}/${row.id}` })"
@@ -85,13 +100,69 @@
         </q-tr>
       </template>
     </CrudTable>
+    <q-dialog v-model="dialogDocumento" v-if="dialogDocumento" persistent>
+      <q-card>
+        <q-toolbar class="bg-grey-5">
+          <q-btn flat round dense icon="attach_file" />
+          <q-toolbar-title class="text-weight-medium">
+            Nuevo Curriculum
+          </q-toolbar-title>
+        </q-toolbar>
+        <q-card-section class="row q-col-gutter-md">
+          <q-file
+            filled
+            bottom-slots
+            v-model="archivo"
+            label="Archivo Curriculum"
+            counter
+            max-files="1"
+            class="col-xs-12 full-width q-py-2"
+            max-file-size="10000000"
+            @rejected="onRejected"
+          >
+            <template v-slot:before>
+              <q-icon name="folder_open" />
+            </template>
+            <template v-slot:append>
+              <q-btn
+                round
+                dense
+                flat
+                icon="add"
+                @click.stop />
+            </template>
+          </q-file>
+          <div class="col-xs-12 text-center">
+            <q-img
+              v-if="['png','jpeg','jpg','gif'].includes(documento.extension)"
+              :src="documento.ruta"
+              spinner-color="white"
+              style="height: 300px; max-width: 300px" />
+            <div v-if="['pdf'].includes(documento.extension)">
+              <iframe
+                :src="documento.ruta"
+                width="100%"
+                height="400px"
+              />
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="cancelar" color="negative" @click="closeDialog" />
+          <q-btn label="Guardar" color="primary" @click="guardarDocumento" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
+
 </template>
 
 <script>
-import { ref, inject } from 'vue'
+import { useRoute } from 'vue-router'
+import { ref, inject, onMounted, watch } from 'vue'
 import CrudTable from '@components/common/CrudTable'
 import Usuario from 'components/Formularios/Usuario'
+import { useQuasar } from 'quasar'
 
 const filters = [
   {
@@ -184,7 +255,13 @@ export default {
   name: 'Dashboard',
   setup () {
     const _http = inject('http')
+    const route = useRoute()
+    const $q = useQuasar()
+    const documento = ref({})
+    const archivo = ref(null)
+    const dialogDocumento = ref(false)
     const url = ref('system/usuarios')
+    const addQuery = ref({ idEntidad: route?.params?.id || null })
     const usuario = ref({
       cargo: null,
       celular: null,
@@ -199,6 +276,22 @@ export default {
       telefono: null,
       usuario: null,
       estado: 'ACTIVO'
+    })
+
+    onMounted(() => {
+    })
+
+    watch(archivo, async (newValue, oldValue) => {
+      if (newValue) {
+        const form = new FormData()
+        form.append('documento', newValue)
+        const respuesta = await _http.post(`system/usuarios/${usuario.value.id}/documento/upload?idEntidad=${usuario.value.idEntidad}`, form)
+
+        documento.value = {
+          extension: (newValue.name.split('.').pop()).toLowerCase(),
+          ruta: respuesta
+        }
+      }
     })
 
     const resetForm = () => {
@@ -242,6 +335,29 @@ export default {
       closeModal(close)
     }
 
+    const guardarDocumento = async () => {
+      await _http.put(`system/usuarios/${usuario.value.id}`, { documento: documento.value })
+      closeDialog()
+    }
+
+    const closeDialog = () => {
+      documento.value = {}
+      dialogDocumento.value = false
+    }
+
+    const openDocumento = async (id) => {
+      if (id) {
+        usuario.value = await _http.get(`/${url.value}/${id}`)
+      }
+      dialogDocumento.value = true
+    }
+
+    const goDocumento = (documento) => {
+      if (documento.ruta) {
+        window.open(documento.ruta)
+      }
+    }
+
     const getNombreCompleto = (usuario) => {
       return `${usuario.nombres} ${usuario.primerApellido} ${usuario.segundoApellido}`
     }
@@ -250,11 +366,25 @@ export default {
       usuario,
       filters,
       columns,
+      archivo,
       url,
       closeModal,
+      dialogDocumento,
+      closeDialog,
+      documento,
       openModal,
+      openDocumento,
       getNombreCompleto,
-      guardar
+      goDocumento,
+      guardar,
+      addQuery,
+      guardarDocumento,
+      onRejected (rejectedEntries) {
+        $q.notify({
+          type: 'negative',
+          message: `${rejectedEntries.length} El archivo pesa mas de 10 MB, permitidos`
+        })
+      }
     }
   }
 }

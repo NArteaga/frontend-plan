@@ -1,14 +1,14 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header :class="{ 'bg-white': ! $q.dark.isActive, 'q-dark': $q.dark.isActive }">
-      <q-toolbar>
-        <q-space />
-        <q-toggle name="dark" v-model="darkMode" icon="dark_mode" @click="darkModeChange" />
-      </q-toolbar>
-    </q-header>
     <q-page-container>
       <router-view />
     </q-page-container>
+    <q-page-sticky position="top-left" :offset="[18,18]" expand>
+      <img src="~assets/min_logo_2021_horizontal.png" style="max-width:350px;"/>
+    </q-page-sticky>
+    <q-page-sticky position="bottom-right" :offset="[18,18]" expand>
+      <img src="~assets/logo-sippase.png" style="max-width:350px;"/>
+    </q-page-sticky>
   </q-layout>
 </template>
 

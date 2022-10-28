@@ -1,9 +1,9 @@
 {
-  "name": "frontend-base",
+  "name": "sippase",
   "version": "0.0.1",
-  "description": "frontend-base",
-  "productName": "frontend-base",
-  "author": "Ivan Tancara Casilla <ivan.tancara.c@gmail.com>",
+  "description": "sippase",
+  "productName": "sippase",
+  "author": "Developer",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
@@ -19,6 +19,7 @@
     "vue": "^3.0.0",
     "vue-i18n": "^9.0.0-beta.0",
     "vue-router": "^4.0.0",
+    "vue3-apexcharts": "^1.4.1",
     "vuedraggable": "^4.0.3",
     "vuex": "^4.0.1"
   },

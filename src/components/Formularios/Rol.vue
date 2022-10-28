@@ -38,18 +38,6 @@
         ></q-input>
         <q-select
           filled
-          v-model="valoresModel.idEntidad"
-          :options="entidades"
-          option-value="id"
-          option-label="nombre"
-          label="Entidad"
-          map-options
-          emit-value
-          class="col-xs-12"
-          :rules="valoresRules.idEntidad"
-        />
-        <q-select
-          filled
           multiple
           use-chips
           v-model="valoresModel.menus"
@@ -128,9 +116,6 @@ const valoresRules = {
   ],
   descripcion: [
     validaciones.requerido
-  ],
-  idEntidad: [
-    validaciones.requerido
   ]
 }
 
@@ -148,19 +133,12 @@ export default {
     const valoresModel = useVModel(props, 'valores')
     const formRol = ref(null)
     const menus = ref([])
-    const entidades = ref([])
     const permisos = ref([])
 
     onMounted(async () => {
-      entidades.value = await getEntidades()
       menus.value = await getMenus()
       valoresModel.value.permisos = await getPermisos()
     })
-
-    async function getEntidades () {
-      const { rows } = await _http.get('/system/entidades')
-      return rows
-    }
 
     async function getMenus () {
       const { rows } = await _http.get('/system/menus')
@@ -199,7 +177,6 @@ export default {
 
     return {
       step,
-      entidades,
       menus,
       valoresModel,
       valoresRules,

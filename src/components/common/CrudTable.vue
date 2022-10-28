@@ -47,8 +47,9 @@
           :rows="registros"
           :columns="getColumns"
           :loading="loading"
-          :rows-per-page-options="[10, 25, 50, 100]"
+          :rows-per-page-options="paginationPerPage"
           :pagination-label="getPaginationLabel"
+          :hidden-header="hiddenHeader"
           no-data-label="No existe registros disponibles"
           no-results-label="No existe registros"
           loading-label="Cargando..."
@@ -184,6 +185,22 @@ export default {
     grid: {
       type: Boolean,
       default: false
+    },
+    paginationPerPage: {
+      type: Array,
+      default: () => [10, 25, 50, 100]
+    },
+    rowsPerPage: {
+      type: Number,
+      default: 10
+    },
+    hiddenHeader: {
+      type: Boolean,
+      default: false
+    },
+    query: {
+      type: Object,
+      default: () => {}
     }
   },
   setup (props) {
@@ -200,7 +217,7 @@ export default {
       sortBy: props.order,
       descending: true,
       page: 1,
-      rowsPerPage: 10,
+      rowsPerPage: props.rowsPerPage || 10,
       rowsNumber: 0,
       'rows-per-page-label': 'Páginas'
     })
@@ -221,10 +238,17 @@ export default {
       })
     }
 
-    const getData = async (props) => {
+    const getData = async (body) => {
       loading.value = true
-      const { page, rowsPerPage, sortBy, descending } = props.pagination
+      const { page, rowsPerPage, sortBy, descending } = body.pagination
+      const querys = {}
+      if (props.query) {
+        for (const key of Object.keys(props?.query)) {
+          if (props.query[key]) querys[key] = props.query[key]
+        }
+      }
       const query = {
+        ...querys,
         limit: rowsPerPage === 0 ? 99999 : rowsPerPage,
         page: page
       }
@@ -244,7 +268,7 @@ export default {
       const { rows, count } = await _http.get(_http.convertQuery(urlCrud.value, query), false)
       if (rows) {
         registros.value = rows
-        pagination.value = props.pagination
+        pagination.value = body.pagination
         pagination.value.rowsNumber = count
       }
       loading.value = false

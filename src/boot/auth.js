@@ -19,7 +19,8 @@ export default boot(({ app, router, store }) => {
         segundoApellido: respuesta.segundoApellido,
         correoElectronico: respuesta.correoElectronico,
         rol: respuesta.roles[0]?.nombre ?? 'Sin rol',
-        entidad: respuesta.entidad.nombre
+        entidad: respuesta.entidad.nombre,
+        idEntidad: respuesta.entidad.id
       }
       _storage.setUsuario(usuario)
       _storage.set('roles', respuesta.roles)

@@ -28,5 +28,6 @@ export default {
   decimales: v => {
     const re = /^\d{0,2}(.\d{0,2}){0,1}$/g
     return re.test(String(v)) || !v || 'Solo se permiten numeros decimales.'
-  }
+  },
+  ponderacion: v => (v > 0 && v <= 100) || 'El rango solo debe ser entre 1 y 100'
 }

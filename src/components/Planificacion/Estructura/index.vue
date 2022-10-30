@@ -1,21 +1,21 @@
 <template>
-    <q-card class="q-ma-md">
-        <Gestiones
-          :url="url"
-          :listaGestiones="gestiones"
-          @gestiones="getGestiones"
-        />
-    </q-card>
-    <q-card class="q-ma-md">
-      <q-card-section>
-        <Estructuras v-model:listaGestiones="gestiones" />
-      </q-card-section>
-    </q-card>
-    <q-card class="q-ma-md">
-      <q-card-section>
-        <Seguimientos v-model:listaGestiones="gestiones" />
-      </q-card-section>
-    </q-card>
+  <q-card class="q-ma-md">
+    <q-card-section>
+      <Estructuras />
+    </q-card-section>
+  </q-card>
+  <q-card class="q-ma-md">
+    <Gestiones
+      :url="url"
+      :listaGestiones="gestiones"
+      @gestiones="getGestiones"
+    />
+  </q-card>
+  <q-card class="q-ma-md">
+    <q-card-section>
+      <Seguimientos v-model:listaGestiones="gestiones" />
+    </q-card-section>
+  </q-card>
 </template>
 <script>
 import { inject, ref, onMounted } from 'vue'

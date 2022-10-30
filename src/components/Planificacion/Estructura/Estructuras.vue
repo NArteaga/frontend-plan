@@ -8,23 +8,12 @@
         <q-btn flat round dense icon="refresh" />
       </q-toolbar>
     </div>
-    <div class="text-center" v-if="estructuras?.length">
+    <div class="text-center">
       <q-btn
         icon="add"
         color="secondary"
         @click="openModal"
         label="Nueva Estructura"
-      />
-    </div>
-    <div class="col-xs-2">
-      <q-select
-        v-model="gestion"
-        :options="gestiones"
-        option-label="gestion"
-        option-value="id"
-        label="Getion"
-        filled
-        @update:model-value="getInitialData"
       />
     </div>
     <div class="col-xs-12">
@@ -47,16 +36,13 @@
               <q-btn flat round icon="list" @click="openModalOperaciones(row)">
                 <q-tooltip> Operaciones </q-tooltip>
               </q-btn>
+              <q-btn flat round icon="delete" color="negative" @click="eliminar(row.id)">
+                <q-tooltip> Eliminar </q-tooltip>
+              </q-btn>
             </q-td>
             <q-td class="text-center">{{ row.sigla }}</q-td>
             <q-td class="text-center">{{ row.nombre }}</q-td>
             <q-td class="text-center">{{ row.nivel }}</q-td>
-            <q-td class="text-center">{{ row.codigo ? "SI" : "NO" }}</q-td>
-            <q-td class="text-center">{{ row.codigoManual ? "SI" : "NO" }}</q-td>
-            <q-td class="text-center">{{ row.areaRequerida ? "SI" : "NO" }}</q-td>
-            <q-td class="text-center">{{ row.editable ? "SI" : "NO" }}</q-td>
-            <q-td class="text-center">{{ row.created ? "SI" : "NO" }}</q-td>
-            <q-td class="text-center">{{ row.cronograma ? "SI" : "NO" }}</q-td>
           </q-tr>
         </template>
       </q-table>
@@ -74,37 +60,29 @@
           @click="crearPrimeraEstructura"
         />
       </div>
-      <div
-        class="q-py-md text-center text-grey"
-        v-if="!gestion?.gestion"
-      >
-        Seleccione una gestion para listar la estructura
-      </div>
       <q-dialog
-            v-model="dialog"
-            persistent
-        >
-            <q-card style="width: 800px; max-width: 90vw;">
-                <q-toolbar class="q-pa-md">
-                <q-icon name="account_tree" size="md"></q-icon>
-                <q-toolbar-title>
-                    {{ registro.id ? 'Editar Registro' : 'Crear Nuevo'}}
-                </q-toolbar-title>
-                <q-space />
-                <q-btn
-                    flat
-                    round
-                    icon="close"
-                    @click="closeModal"
-                ></q-btn>
-                </q-toolbar>
-                <q-card-section>
-                <q-form
-                    ref="formEstructura"
-                    @submit="save"
-                    class="row q-col-gutter-sm"
-                >
-                    <q-select
+        v-model="dialog"
+        persistent>
+          <q-card style="width: 800px; max-width: 90vw;">
+            <q-toolbar class="q-pa-md">
+            <q-icon name="account_tree" size="md"></q-icon>
+            <q-toolbar-title>
+                {{ registro.id ? 'Editar Registro' : 'Crear Nuevo'}}
+            </q-toolbar-title>
+            <q-space />
+            <q-btn
+                flat
+                round
+                icon="close"
+                @click="closeModal"
+            ></q-btn>
+            </q-toolbar>
+            <q-card-section>
+              <q-form
+                  ref="formEstructura"
+                  @submit="save"
+                  class="row q-col-gutter-sm" >
+                <q-select
                         v-if="!registro.nivel"
                         v-model="registro.idEstructuraPadre"
                         :options="estructuras"
@@ -116,8 +94,8 @@
                         option-label="nombre"
                         option-value="id"
                         class="required col-xs-12 col-md-12"
-                    />
-                    <q-input
+                />
+                <q-input
                         filled
                         class="required col-xs-10 col-md-10"
                         label="Nombre"
@@ -125,16 +103,16 @@
                         v-model="registro.nombre"
                         :rules="rules.requerido"
                         @keyup="updateSigla"
-                    />
-                    <q-input
+                />
+                <q-input
                         filled
                         class="required col-xs-2 col-md-2"
                         label="Sigla"
                         type="string"
                         v-model="registro.sigla"
                         :rules="rules.requerido"
-                    />
-                    <div class="col-xs-6 text-center">
+                />
+                <div class="col-xs-4 text-center">
                       <q-toggle
                         label="¿Generar Código?"
                         v-model="registro.codigo"
@@ -143,8 +121,8 @@
                         unchecked-icon="clear"
                         left-label
                       />
-                    </div>
-                    <div class="col-xs-6 text-center">
+                </div>
+                <div class="col-xs-4 text-center">
                       <q-toggle
                         label="¿Código Manual?"
                         v-model="registro.codigoManual"
@@ -154,8 +132,8 @@
                         unchecked-icon="clear"
                         left-label
                       />
-                    </div>
-                    <div class="col-xs-6 text-center">
+                </div>
+                <div class="col-xs-4 text-center">
                       <q-toggle
                         label="¿Registrar Cronograma?"
                         v-model="registro.cronograma"
@@ -164,67 +142,115 @@
                         unchecked-icon="clear"
                         left-label
                       />
-                    </div>
-                    <div class="col-xs-6 text-center">
+                </div>
+                <div class="col-xs-4 text-center">
                       <q-toggle
-                        label="¿Area requerida?"
-                        v-model="registro.areaRequerida"
+                        label="¿Registrar Eje?"
+                        v-model="registro.eje"
                         color="positive"
                         checked-icon="check"
                         unchecked-icon="clear"
                         left-label
                       />
-                    </div>
-                    <div class="col-xs-6 text-center">
+                </div>
+                <div class="col-xs-4 text-center">
                       <q-toggle
-                        label="¿Contenido Editable?"
-                        v-model="registro.editable"
+                        label="¿Registrar Pilar?"
+                        v-model="registro.pilar"
                         color="positive"
                         checked-icon="check"
                         unchecked-icon="clear"
                         left-label
                       />
-                    </div>
-                    <div class="col-xs-6 text-center">
+                </div>
+                <div class="col-xs-4 text-center">
                       <q-toggle
-                        label="¿Crear Estructura?"
-                        v-model="registro.created"
+                        label="¿Registrar Lineamiento?"
+                        v-model="registro.lineamientos"
                         color="positive"
                         checked-icon="check"
                         unchecked-icon="clear"
                         left-label
                       />
-                    </div>
-                    <div class="col-xs-12 text-right q-gutter-sm q-pt-lg">
-                    <q-btn
-                        icon="close"
-                        label="Cancelar"
-                        @click="closeModal()"
-                    ></q-btn>
-                    <q-btn
-                        type="submit"
-                        icon="check"
-                        color="primary"
-                        label="Guardar"
-                    ></q-btn>
-                    </div>
-                </q-form>
-                </q-card-section>
-            </q-card>
-        </q-dialog>
+                </div>
+                <div class="col-xs-4 text-center">
+                      <q-toggle
+                        label="¿Registrar Objetivo?"
+                        v-model="registro.objetivo"
+                        color="positive"
+                        checked-icon="check"
+                        unchecked-icon="clear"
+                        left-label
+                      />
+                </div>
+                <div class="col-xs-4 text-center">
+                      <q-toggle
+                        label="¿Registrar Acciones?"
+                        v-model="registro.accion"
+                        color="positive"
+                        checked-icon="check"
+                        unchecked-icon="clear"
+                        left-label
+                      />
+                </div>
+                <div class="col-xs-4 text-center">
+                  <q-toggle
+                    label="¿Area requerida?"
+                    v-model="registro.areaRequerida"
+                    color="positive"
+                    checked-icon="check"
+                    unchecked-icon="clear"
+                    left-label
+                  />
+                </div>
+                <div class="col-xs-4 text-center">
+                  <q-toggle
+                    label="¿Contenido Editable?"
+                    v-model="registro.editable"
+                    color="positive"
+                    checked-icon="check"
+                    unchecked-icon="clear"
+                    left-label
+                  />
+                </div>
+                <div class="col-xs-4 text-center">
+                  <q-toggle
+                    label="¿Crear Estructura?"
+                    v-model="registro.created"
+                    color="positive"
+                    checked-icon="check"
+                    unchecked-icon="clear"
+                    left-label
+                  />
+                </div>
+                <div class="col-xs-12 text-right q-gutter-sm q-pt-lg">
+                  <q-btn
+                    icon="close"
+                    label="Cancelar"
+                    @click="closeModal()" />
+                  <q-btn
+                    type="submit"
+                    icon="check"
+                    color="primary"
+                    label="Guardar" />
+                </div>
+              </q-form>
+            </q-card-section>
+          </q-card>
+      </q-dialog>
     </div>
   </div>
-   <Operaciones
-        v-if="dialogOperaciones"
-        v-model:dialog="dialogOperaciones"
-        :gestion="gestion"
-        :estructura="estructura"
+    <Operaciones
+      v-if="dialogOperaciones"
+      v-model:dialog="dialogOperaciones"
+      :gestion="gestion"
+      :estructura="estructura"
     />
 </template>
 <script>
 import { inject, onMounted, ref } from 'vue'
 import Operaciones from './Operaciones'
-import axios from 'axios'
+import { useQuasar } from 'quasar'
 import { useVModel } from 'src/composables/useVModel'
 import validaciones from '@common/validations'
 
@@ -258,42 +284,6 @@ const columns = [
     label: 'Nivel',
     align: 'center',
     sortable: false
-  },
-  {
-    name: 'codigo',
-    label: '¿Genera Código?',
-    align: 'center',
-    sortable: false
-  },
-  {
-    name: 'codigoManual',
-    label: '¿Código Manual?',
-    align: 'center',
-    sortable: false
-  },
-  {
-    name: 'areaRequerida',
-    label: '¿Area Requerida?',
-    align: 'center',
-    sortable: false
-  },
-  {
-    name: 'editable',
-    label: '¿Contenido Editable?',
-    align: 'center',
-    sortable: false
-  },
-  {
-    name: 'created',
-    label: '¿Crear Estructura?',
-    align: 'center',
-    sortable: false
-  },
-  {
-    name: 'cronograma',
-    label: '¿Con Cronograma?',
-    align: 'center',
-    sortable: false
   }
 ]
 export default {
@@ -308,23 +298,23 @@ export default {
   },
   setup (props) {
     const _http = inject('http')
-    const _storage = inject('storage')
     const url = ref('planificacion/estructura')
     const gestiones = useVModel(props, 'listaGestiones')
     const gestion = ref()
     const estructuras = ref([])
     const estructura = ref({})
     const dialog = ref(false)
+    const $q = useQuasar()
     const registro = ref({})
     const dialogOperaciones = ref(false)
 
     onMounted(async () => {
-      if (gestion?.value?.id) await getInitialData()
+      await getInitialData()
     })
 
     const getInitialData = async () => {
       const { rows } = await _http.get(
-        `${url.value}?idGestion=${gestion?.value?.id}&order=nivel`
+        `${url.value}?order=nivel`
       )
       estructuras.value = rows
     }
@@ -335,7 +325,12 @@ export default {
         codigo: true,
         areaRequerida: false,
         editable: false,
-        created: false
+        created: false,
+        eje: false,
+        pilar: false,
+        lineamientos: false,
+        objetivo: false,
+        accio: false
       }
     }
 
@@ -350,20 +345,6 @@ export default {
     const openModalOperaciones = (data) => {
       estructura.value = data
       dialogOperaciones.value = true
-    }
-    const generarReporte = async (row) => {
-      let urlXlsx = `${process.env.API_URL}planificacion/operacion/reporte`
-      if (row) urlXlsx = `${urlXlsx}?idEstructura=${row.id}`
-      const { data } = await axios({
-        url: urlXlsx,
-        headers: { Authorization: `Bearer ${_storage.get('token')}` },
-        responseType: 'blob'
-      })
-      const downloadLink = document.createElement('a')
-      const url = window.URL.createObjectURL(data)
-      downloadLink.href = url
-      downloadLink.download = `${row?.sigla || 'POA'}.xlsx`
-      downloadLink.click()
     }
 
     const closeModal = () => {
@@ -389,6 +370,27 @@ export default {
       closeModal()
     }
 
+    const eliminar = async (id) => {
+      $q.dialog({
+        title: 'Confirmacion',
+        message: '¿Esta seguro de eliminar la estructura?',
+        persistent: true,
+        ok: {
+          color: 'primary',
+          label: 'Aceptar'
+        },
+        cancel: {
+          color: 'white',
+          'text-color': 'black',
+          label: 'Cancelar'
+        }
+      }).onOk(async () => {
+        await _http.delete(`/${url.value}/${id}`)
+        await getInitialData()
+      }).onCancel(async () => {
+      })
+    }
+
     const updateSigla = () => {
       const nombre = registro.value.nombre?.trim().split(' ').map(item => (item.length > 2 ? item[0] : '')).join('').toUpperCase()
       registro.value.sigla = nombre
@@ -397,6 +399,7 @@ export default {
     return {
       columns,
       gestiones,
+      eliminar,
       estructuras,
       estructura,
       gestion,
@@ -410,8 +413,7 @@ export default {
       getInitialData,
       updateSigla,
       save,
-      openModalOperaciones,
-      generarReporte
+      openModalOperaciones
     }
   }
 }

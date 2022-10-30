@@ -119,7 +119,7 @@ export default {
 </script>
 <style>
 .login {
-  background: url("~assets/login.png") no-repeat center center fixed;
+  background: url("~assets/login.jpeg") no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;

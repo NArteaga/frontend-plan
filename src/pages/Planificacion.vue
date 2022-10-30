@@ -16,8 +16,9 @@
             narrow-indicator
             inline-label
             >
-                <q-tab name="gestion" icon="settings" label="Estructura" />
+                <q-tab name="gestion" icon="settings" label="Configuración" />
                 <q-tab name="planificacion" icon="book" label="Planificación" />
+                <q-tab name="pilar" icon="account_balance" label="Pilar" />
                 <!--<q-tab name="seguimiento" label="Seguimiento" v-if="$permisos.and('seguimiento:listar')" />-->
             </q-tabs>
             <q-tab-panels v-model="tab" animated class="transparent">
@@ -27,15 +28,9 @@
                 <q-tab-panel  name="planificacion" class="q-pa-none">
                   <Planificacion />
                 </q-tab-panel>
-                <q-tab-panel  name="formulacion" class="q-pa-none">
-                    <Formulacion />
+                <q-tab-panel  name="pilar" class="">
+                  <Pilar />
                 </q-tab-panel>
-                <!-- <q-tab-panel  name="seguimiento" class="q-pa-none">
-                    <Seguimiento />
-                </q-tab-panel>
-                <q-tab-panel  name="reformulacion" class="q-pa-none">
-                    <Reformulacion />
-                </q-tab-panel> -->
             </q-tab-panels>
         </div>
     </div>
@@ -46,7 +41,7 @@
 import { ref } from 'vue'
 import Planificacion from '@components/Planificacion/Planificacion'
 import Estructura from '@components/Planificacion/Estructura'
-import Formulacion from '@components/Planificacion/Formulacion'
+import Pilar from '@components/Planificacion/Pilar'
 // import Reformulacion from '@components/Planificacion/Reformulacion'
 // import Seguimiento from 'src/components/Planificacion/Seguimiento/index.vue'
 
@@ -54,22 +49,12 @@ export default {
   components: {
     Estructura,
     Planificacion,
-    Formulacion
+    Pilar
     // Seguimiento,
     // Reformulacion
   },
   setup () {
     const tab = ref('gestion')
-    // const permisos = inject('permisos')
-
-    /* onMounted(async () => {
-      if (permisos.and(['poappto:listar'])) {
-        tab.value = 'poa'
-      } else {
-        tab.value = 'seguimiento'
-      }
-    }) */
-
     return {
       tab
     }

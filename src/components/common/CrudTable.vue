@@ -139,6 +139,7 @@
               :open="openModal"
               :update="updateList"
               :eliminar="eliminar"
+              :enviar="enviar"
               :cambiarEstado="cambiarEstado"
               name="row"
             />
@@ -328,6 +329,35 @@ export default {
       })
     }
 
+    const enviar = ({ titulo, mensaje, aceptar, cancelar, url }) => {
+      $q.dialog({
+        title: titulo || 'Confirmacion',
+        message: mensaje || '¿Esta seguro de enviar el registro?',
+        persistent: true,
+        ok: {
+          color: 'primary',
+          label: 'Aceptar'
+        },
+        cancel: {
+          color: 'white',
+          'text-color': 'black',
+          label: 'Cancelar'
+        }
+      }).onOk(async () => {
+        if (aceptar) {
+          await aceptar()
+        } else {
+          await _http.put(url)
+        }
+        _message.success('Eliminado de manera correcta.')
+        await updateList()
+      }).onCancel(async () => {
+        if (cancelar) {
+          await cancelar()
+        }
+      })
+    }
+
     const cambiarEstado = async ({ registro, url, titulo, mensaje, aceptar, cancelar }) => {
       const estadoOriginal = registro.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO'
       $q.dialog({
@@ -374,6 +404,7 @@ export default {
       crudTableModal,
       selected: ref([]),
       eliminar,
+      enviar,
       cambiarEstado,
       getData,
       toggleSearch,

@@ -12,6 +12,7 @@
   "dependencies": {
     "@asigloo/vue-dynamic-forms": "^3.14.0",
     "@quasar/extras": "^1.14.0",
+    "apexcharts": "^3.36.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",

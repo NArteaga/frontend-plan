@@ -58,7 +58,10 @@ const routes = [
       { path: 'parametros', name: 'parametros', component: () => import('pages/Parametros.vue') },
       { path: 'interoperabilidad', name: 'interoperabilidad', component: () => import('pages/Interoperabilidad.vue') },
       { path: 'planificacion', name: 'planificacion', component: () => import('pages/Planificacion.vue') },
-      { path: 'entidades/plan/:id', name: 'formulacionPoa', component: () => import('components/Planificacion/Formulacion/Formulacion.vue') }
+      { path: 'entidades/plan/:id', name: 'formulacionPoa', component: () => import('components/Planificacion/Formulacion/Formulacion.vue') },
+      { path: 'red-funcional/solicitudes/seguimiento', name: 'rf_admin_solicitudes', component: () => import('pages/RFuncional/Administrador/Solicitudes.vue') },
+      { path: 'red-funcional/solicitudes', name: 'rf_solicitudes', component: () => import('pages/RFuncional/Funcionario/SolicitudesPorEntidad.vue') }
+
     ]
   },
   {

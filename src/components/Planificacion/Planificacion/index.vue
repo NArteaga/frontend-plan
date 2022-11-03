@@ -139,10 +139,10 @@ export default {
       cronograma: [],
       tareas: [],
       mediosVerificacion: [],
-      bienServicioDemandado: []
+      bienServicioDemandado: [],
+      objetivo: null
     })
     onMounted(async () => {
-      console.log(props)
       if (!props?.institucion) {
         entidad.value = {
           id: _storage.get('usuario').idEntidad,

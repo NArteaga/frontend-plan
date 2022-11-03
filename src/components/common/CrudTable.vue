@@ -9,6 +9,7 @@
           name="form"
           :close="closeModal"
           :update="updateList"
+          :addRegistro="addRegistro"
         >Agregue su formulario aquí</slot>
       </q-dialog>
     </div>
@@ -136,6 +137,7 @@
           <template v-slot:body="props">
             <slot
               :row="props.row"
+              :index="props.rowIndex"
               :open="openModal"
               :update="updateList"
               :eliminar="eliminar"
@@ -275,6 +277,14 @@ export default {
       loading.value = false
     }
 
+    const addRegistro = (row, index = -1) => {
+      console.log(index)
+      if (index > -1) registros.value[index] = row
+      else {
+        registros.value.push(row)
+      }
+    }
+
     const toggleSearch = () => {
       enableSearch.value = !enableSearch.value
       search.value = {}
@@ -300,7 +310,7 @@ export default {
       })
     })
 
-    const eliminar = ({ titulo, mensaje, aceptar, cancelar, url }) => {
+    const eliminar = ({ titulo, mensaje, aceptar, cancelar, url }, index) => {
       $q.dialog({
         title: titulo || 'Confirmacion',
         message: mensaje || '¿Esta seguro de eliminar el registro?',
@@ -318,7 +328,11 @@ export default {
         if (aceptar) {
           await aceptar()
         } else {
-          await _http.delete(url)
+          try {
+            await _http.delete(url)
+          } catch (error) {
+            registros.value.splice(index, 1)
+          }
         }
         _message.success('Eliminado de manera correcta.')
         await updateList()
@@ -409,6 +423,7 @@ export default {
       getData,
       toggleSearch,
       updateList,
+      addRegistro,
       openModal: () => { crudTableModal.value = true },
       closeModal: () => { crudTableModal.value = false },
       getPaginationLabel

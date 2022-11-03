@@ -89,9 +89,9 @@ export default {
 
     async function getHistorial () {
       reclamo.value = await Http.get(`rfuncional/historial/?rfuncionalSolicitudId=${props.idReclamo}`)
-      console.log(reclamo.value)
-      console.log(reclamo.value.historial)
-      console.log(reclamo.value.rows)
+      // console.log(reclamo.value)
+      // console.log(reclamo.value.historial)
+      // console.log(reclamo.value.rows)
     }
 
     function closeModal () {

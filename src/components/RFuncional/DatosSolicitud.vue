@@ -234,7 +234,7 @@ export default {
 
         mymap.on('click', onMapClick)
       } catch (err) {
-        console.log(err)
+        // console.log(err)
       }
     }
     // MODAL SHOW DATA -------------------------------------------

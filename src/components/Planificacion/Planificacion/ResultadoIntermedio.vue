@@ -14,6 +14,15 @@
                         <q-tooltip>Editar</q-tooltip>
                     </q-btn>
                     <q-btn
+                      round
+                      color="positive"
+                      icon="wallet"
+                      flat
+                      @click="openPresupuesto(props.row)"
+                      >
+                        <q-tooltip>Presupuesto</q-tooltip>
+                    </q-btn>
+                    <q-btn
                       v-if="formulacion"
                       round
                       color="primary"
@@ -80,14 +89,14 @@
         </template>
     </q-table>
     <Operacion
-        v-if="dialogOperacion"
-        v-model:dialog="dialogOperacion"
-        :estructura="estructura"
-        v-model:value="selected"
-        :gestion="gestion"
-        :entidad="entidad"
-        @creado="closeModal"
-        @cancelar="cancelarModal"
+      v-if="dialogOperacion"
+      v-model:dialog="dialogOperacion"
+      :estructura="estructura"
+      v-model:value="selected"
+      :gestion="gestion"
+      :entidad="entidad"
+      @creado="closeModal"
+      @cancelar="cancelarModal"
     />
     <q-dialog v-model="dialogCronograma" persistent>
       <q-card style="width: 1200px; max-width: 80vw;">
@@ -116,13 +125,20 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <Presupuesto
+      v-if="dialogPresupuesto"
+      v-model:value="selected"
+      v-model:open="dialogPresupuesto"
+      :entidad="entidad"
+      @closeModal="closePresupuesto"
+    />
 </template>
 <script>
 import { ref, onMounted, inject } from 'vue'
 import Operacion from '@components/Planificacion/Estructura/Operacion'
 import Cronograma from '../Operacion/Cronograma'
 import CronogramaSeguimiento from '../Operacion/CronogramaSeguimiento.vue'
-
+import Presupuesto from './Presupuesto'
 import { date, useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 const { formatDate } = date
@@ -226,13 +242,15 @@ export default {
   components: {
     Operacion,
     Cronograma,
-    CronogramaSeguimiento
+    CronogramaSeguimiento,
+    Presupuesto
   },
   setup (props, { emit }) {
     const $q = useQuasar()
     const _http = inject('http')
     const data = ref([])
     const dialogOperacion = ref(false)
+    const dialogPresupuesto = ref(false)
     const selected = ref(null)
     const estructura = ref({})
     const dialogCronograma = ref(false)
@@ -288,12 +306,21 @@ export default {
       dialogOperacion.value = false
     }
 
+    const closePresupuesto = () => {
+      selected.value = {}
+      dialogPresupuesto.value = false
+    }
+
     const editarOperacion = async (data) => {
       const { rows } = await _http.get(`planificacion/cronograma?idOperacion=${data.id}`)
       selected.value = { ...data }
       selected.value.cronograma = rows
       estructura.value = data.estructura
       dialogOperacion.value = true
+    }
+    const openPresupuesto = async (data) => {
+      selected.value = { ...data }
+      dialogPresupuesto.value = true
     }
     const getColorOperacion = (operacion) => {
       return 'positive'
@@ -342,6 +369,9 @@ export default {
       formatDate,
       getData,
       dialogOperacion,
+      dialogPresupuesto,
+      openPresupuesto,
+      closePresupuesto,
       editarOperacion,
       selected,
       estructura,

@@ -111,6 +111,28 @@ export default boot(({ app, router, store }) => {
     logout,
     logoutCiudadania
   })
+
+  const orPermisos = (acciones) => {
+    if (Array.isArray(acciones)) {
+      for (const action of acciones) {
+        if (_storage.get('permisos')[action]) return true
+      }
+      return false
+    }
+    return _storage.get('permisos')[acciones] || false
+  }
+  const andPermisos = (acciones) => {
+    if (Array.isArray(acciones)) {
+      for (const action of acciones) {
+        if (!_storage.get('permisos')[action]) return false
+      }
+      return true
+    }
+    return _storage.get('permisos')[acciones] || false
+  }
+
+  app.config.globalProperties.$permisos = { and: andPermisos, or: orPermisos }
+  app.provide('permisos', { and: andPermisos, or: orPermisos })
 })
 
 //

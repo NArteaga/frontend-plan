@@ -95,7 +95,8 @@ export default boot(({ app, router, store }) => {
     convertQuery (url, query) {
       let string = []
       for (const i in query) {
-        string.push(i + '=' + query[i])
+        if (!Array.isArray(query[i])) string.push(i + '=' + query[i])
+        else for (const item of query[i]) string.push(`${i}=${item}`)
       }
       string = string.join('&')
       if (url.includes('?')) {

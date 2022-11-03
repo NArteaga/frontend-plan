@@ -99,6 +99,96 @@
                   class="required col-xs-12 q-pb-xs"
                   :rules="rules.requerido"
                 />
+                <q-input
+                  v-if="estructura?.objetivo || tipoEstructura?.objetivo"
+                  v-model="model.objetivo"
+                  label="Objetivo"
+                  type="textarea"
+                  filled
+                  autogrow
+                  rows="1"
+                  class="required col-xs-12 q-pb-xs"
+                  :rules="rules.requerido"
+                />
+                <q-select
+                  v-if="estructura?.eje || tipoEstructura?.eje"
+                  v-model="model.eje"
+                  :options="optionsEje"
+                  emit-value
+                  map-options
+                  multiple
+                  option-value="id"
+                  label="Ejes"
+                  filled
+                  @update:model-value="filterEje"
+                  class="required col-xs-4"
+                >
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label
+                          >{{ scope.opt.codigo }}
+                          {{ scope.opt.nombre }}</q-item-label
+                        >
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                  <template v-slot:selected-item="scope">
+                    {{ scope.opt.codigo }} {{ scope.opt.nombre }} <br />
+                  </template>
+                </q-select>
+                <q-select
+                  v-if="estructura?.pilar || tipoEstructura?.pilar"
+                  v-model="model.pilar"
+                  :options="optionPilar"
+                  emit-value
+                  map-options
+                  multiple
+                  option-value="id"
+                  label="Pilares"
+                  filled
+                  class="required col-xs-4"
+                >
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label
+                          >{{ scope.opt.codigo }}
+                          {{ scope.opt.nombre }}</q-item-label
+                        >
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                  <template v-slot:selected-item="scope">
+                    {{ scope.opt.codigo }} {{ scope.opt.nombre }} <br />
+                  </template>
+                </q-select>
+                <q-select
+                  v-if="estructura?.lineamientos || tipoEstructura?.lineamientos"
+                  v-model="model.lineamiento"
+                  :options="optionsLineamientos"
+                  emit-value
+                  map-options
+                  multiple
+                  option-value="id"
+                  label="Lineamientos"
+                  filled
+                  class="required col-xs-4"
+                >
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label
+                          >{{ scope.opt.codigo }}
+                          {{ scope.opt.nombre }}</q-item-label
+                        >
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                  <template v-slot:selected-item="scope">
+                    {{ scope.opt.codigo }} {{ scope.opt.nombre }} <br />
+                  </template>
+                </q-select>
                 <q-select
                   v-model="model.tipoMeta"
                   :options="['PORCENTUAL', 'NUMERICO']"
@@ -305,7 +395,10 @@ export default {
     const minDate = ref()
     const maxDate = ref()
     const tipoEstructura = ref()
+    const optionsEje = ref([])
+    const optionsLineamientos = ref([])
     const optionEstructura = ref([])
+    const optionPilar = ref([])
     const visibleOperacionPadre = ref(
       props.estructura.nivel > 1 && !model.value?.idOperacionPadre)
 
@@ -319,6 +412,13 @@ export default {
       }
       if (!props.estructura.id) {
         optionEstructura.value = await getEstructuraBase()
+        if (optionEstructura.value.length === 1) tipoEstructura.value = optionEstructura.value[0]
+      }
+      optionsEje.value = await getParamater({ grupo: 'TIPO_EJE' })
+      if (model.value?.eje?.length > 0) filterEje(model.value.eje)
+      else {
+        optionsLineamientos.value = await getParamater({ grupo: '_EJE_' })
+        optionPilar.value = await getPilar()
       }
       if (props?.entidad?.id) {
         model.value.entidad = props.entidad
@@ -331,7 +431,14 @@ export default {
       if (!model.value?.fechaInicio) model.value.fechaInicio = `03/01/${props.gestion.gestion}`
       if (!model.value?.fechaFin) model.value.fechaFin = `29/12/${props.gestion.gestion}`
     })
-
+    const getParamater = async (query) => {
+      const { rows } = await _http.get(_http.convertQuery('system/parametros', query))
+      return rows
+    }
+    const getPilar = async (query = {}) => {
+      const { rows } = await _http.get(_http.convertQuery('planificacion/pilar', query))
+      return rows
+    }
     const getAreas = async () => {
       const { rows } = await _http.get('system/entidades')
       return rows
@@ -428,6 +535,13 @@ export default {
       }
     }
 
+    const filterEje = async (items) => {
+      optionPilar.value = await getPilar({ idEje: items })
+      const data = optionsEje.value.filter(item => items.includes(item.id)).map(item => { return `_${item.codigo.replace(' ', '_')}_` })
+      console.log(data)
+      optionsLineamientos.value = await getParamater({ grupo: data })
+    }
+
     const updateDescripcion = (value) => {
       // model.value.desc
     }
@@ -446,6 +560,7 @@ export default {
       visibleOperacionPadre,
       tipoEstructura,
       optionEstructura,
+      optionPilar,
       filterFn (val, update) {
         if (val === '') {
           update(() => {
@@ -465,8 +580,11 @@ export default {
       step,
       siguiente,
       anterior,
+      optionsEje,
+      optionsLineamientos,
       verificarMeta,
-      updateDescripcion
+      updateDescripcion,
+      filterEje
     }
   }
 }

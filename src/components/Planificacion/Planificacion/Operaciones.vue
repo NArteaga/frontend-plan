@@ -137,10 +137,12 @@ export default {
   },
   setup (props, { emit }) {
     const model = ref({
+      idOperacionPadre: null,
       cronograma: [],
       tareas: [],
       mediosVerificacion: [],
-      bienServicioDemandado: []
+      bienServicioDemandado: [],
+      objetivo: null
     })
     const _http = inject('http')
     const dialog = ref(false)
@@ -171,7 +173,8 @@ export default {
         cronograma: [],
         tareas: [],
         mediosVerificacion: [],
-        bienServicioDemandado: []
+        bienServicioDemandado: [],
+        objetivo: null
       }
       model.value.idOperacionPadre = operacion.id
       dialog.value = true
